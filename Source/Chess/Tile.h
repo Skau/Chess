@@ -6,6 +6,18 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+enum class EDirection 
+{
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	DIARIGHTUP,
+	DIARIGHTDOWN,
+	DIALEFTUP,
+	DIALEFTDOWN
+};
+
 UCLASS()
 class CHESS_API ATile : public AActor
 {
@@ -25,6 +37,8 @@ public:
 	void SetHighlightedPossibleCaptureMaterial();
 
 	void SetDefaultMaterial();
+
+	void SetAllTilesAroundBlue();
 
 	bool GetIfLightMaterial() { return (bIsLightMaterial ? true : false); }
 
@@ -51,6 +65,28 @@ public:
 	int GetRow() { return Row; }
 
 	void SetRow(int RowIn) { Row = RowIn; }
+
+	TArray<ATile*>& GetAllTilesInADirection(ATile* StartTile, EDirection Direction);
+
+	ATile* GetSingleTile(ATile* StartTile, EDirection Direction, int NumberOfTilesAway);
+
+	void SetTileUp(ATile* TileIn) { TileUp = TileIn; }
+	void SetTileDown(ATile* TileIn) { TileDown = TileIn; }
+	void SetTileLeft(ATile* TileIn) { TileLeft = TileIn; }
+	void SetTileRight(ATile* TileIn) { TileRight = TileIn; }
+	void SetTileDiagonalRightUp(ATile* TileIn) { TileDiagonalRightUp = TileIn; }
+	void SetTileDiagonalLeftUp(ATile* TileIn) { TileDiagonalLeftUp = TileIn; }
+	void SetTileDiagonalRightDown(ATile* TileIn) { TileDiagonalRightDown = TileIn; }
+	void SetTileDiagonalLeftDown(ATile* TileIn) { TileDiagonalLeftDown = TileIn; }
+
+	ATile* GetTileUp() { return TileUp; }
+	ATile* GetTileDown() { return TileDown; }
+	ATile* GetTileLeft() { return TileLeft; }
+	ATile* GetTileRight() { return TileRight; }
+	ATile* GetTileDiagonalRightUp() { return TileDiagonalRightUp; }
+	ATile* GetTileDiagonalLeftUp() { return TileDiagonalLeftUp; }
+	ATile* GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
+	ATile* GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
 
 private:
 	// Sets default values for this actor's properties
@@ -92,5 +128,16 @@ private:
 	bool bIsPossibleCaptureLocation = false;
 
 	int Row = 0;
-	
+
+	ATile* TileUp = nullptr;
+	ATile* TileDown = nullptr;
+	ATile* TileLeft = nullptr;
+	ATile* TileRight = nullptr;
+	ATile* TileDiagonalRightUp = nullptr;
+	ATile* TileDiagonalLeftUp = nullptr;
+	ATile* TileDiagonalRightDown = nullptr;
+	ATile* TileDiagonalLeftDown = nullptr;
+
+	TArray<ATile*> AllTilesInADirection;
+
 };

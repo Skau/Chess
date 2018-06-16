@@ -127,6 +127,69 @@ void ABoard::SpawnTiles()
 				}
 			}
 		}
+
+		if (Tiles.Num())
+		{
+			for (int i = 0; i < 64; ++i)
+			{
+				if (i + 1 >= 0 && i + 1 <= 63)
+				{
+					if (Tiles[i + 1])
+					{
+						Tiles[i]->SetTileDown(Tiles[i + 1]);
+					}
+				}
+				if (i - 1 >= 0 && i - 1 <= 63)
+				{
+					if (Tiles[i - 1])
+					{
+						Tiles[i]->SetTileUp(Tiles[i - 1]);
+					}
+				}
+				if (i + 8 >= 0 && i + 8 <= 63)
+				{
+					if (Tiles[i + 8])
+					{
+						Tiles[i]->SetTileLeft(Tiles[i + 8]);
+					}
+				}
+				if (i - 8 >= 0 && i - 8 <= 63)
+				{
+					if (Tiles[i - 8])
+					{
+						Tiles[i]->SetTileRight(Tiles[i - 8]);
+					}
+				}
+				if (i + 9 >= 0 && i + 9 <= 63)
+				{
+					if (Tiles[i + 9])
+					{
+						Tiles[i]->SetTileDiagonalLeftDown(Tiles[i + 9]);
+					}
+				}
+				if (i - 9 >= 0 && i - 9 <= 63)
+				{
+					if (Tiles[i - 9])
+					{
+						Tiles[i]->SetTileDiagonalRightDown(Tiles[i - 9]);
+					}
+				}
+				if (i + 7 >= 0 && i + 7 <= 63)
+				{
+					if (Tiles[i + 7])
+					{
+						Tiles[i]->SetTileDiagonalLeftUp(Tiles[i + 7]);
+					}
+				}
+				if (i - 7 >= 0 && i - 7 <= 63)
+				{
+					if (Tiles[i - 7])
+					{
+						Tiles[i]->SetTileDiagonalRightUp(Tiles[i - 7]);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -184,3 +247,103 @@ ATile* ABoard::GetTileUnderCursor(FVector CursorLocation)
 	return TileToReturn;
 }
 
+void ABoard::UpdateTilesForTile(ATile* TileToUpdate)
+{
+	if (Tiles.Num())
+	{
+		for (int i = 0; i <= 63; ++i)
+		{
+			if (Tiles[i] == TileToUpdate)
+			{
+				if (i + 1 >= 0 && i + 1<= 63)
+				{
+					if (Tiles[i + 1])
+					{
+						if (TileToUpdate->GetTileDown())
+						{
+							TileToUpdate->GetTileDown()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileDown(Tiles[i + 1]);
+					}
+				}
+				if (i - 1 >= 0 && i - 1 <= 63)
+				{
+					if (Tiles[i - 1])
+					{
+						if (TileToUpdate->GetTileUp())
+						{
+							TileToUpdate->GetTileUp()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileUp(Tiles[i - 1]);
+					}
+				}
+				if (i + 8 >= 0 && i + 8 <= 63)
+				{
+					if (Tiles[i + 8])
+					{
+						if (TileToUpdate->GetTileLeft())
+						{
+							TileToUpdate->GetTileLeft()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileLeft(Tiles[i + 8]);
+					}
+				}
+				if (i - 8 >= 0 && i - 8 <= 63)
+				{
+					if (Tiles[i - 8])
+					{
+						if (TileToUpdate->GetTileRight())
+						{
+							TileToUpdate->GetTileRight()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileRight(Tiles[i - 8]);
+					}
+				}
+				if (i + 9 >= 0 && i + 9 <= 63)
+				{
+					if (Tiles[i + 9])
+					{
+						if (TileToUpdate->GetTileDiagonalLeftDown())
+						{
+							TileToUpdate->GetTileDiagonalLeftDown()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileDiagonalLeftDown(Tiles[i + 9]);
+					}
+				}
+				if (i - 9 >= 0 && i - 9 <= 63)
+				{
+					if (Tiles[i - 9])
+					{
+						if (TileToUpdate->GetTileDiagonalRightDown())
+						{
+							TileToUpdate->GetTileDiagonalRightDown()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileDiagonalRightDown(Tiles[i - 9]);
+					}
+				}
+				if (i + 7 >= 0 && i + 7 <= 63)
+				{
+					if (Tiles[i + 7])
+					{
+						if (TileToUpdate->GetTileDiagonalLeftUp())
+						{
+							TileToUpdate->GetTileDiagonalLeftUp()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileDiagonalLeftUp(Tiles[i + 7]);
+					}
+				}
+				if (i - 7 >= 0 && i - 7 <= 63)
+				{
+					if (Tiles[i - 7])
+					{
+						if (TileToUpdate->GetTileDiagonalRightUp())
+						{
+							TileToUpdate->GetTileDiagonalRightUp()->SetDefaultMaterial();
+						}
+						TileToUpdate->SetTileDiagonalRightUp(Tiles[i - 7]);
+					}
+				}
+			}
+		}
+	}
+}

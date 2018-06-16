@@ -8,8 +8,6 @@
 
 class ATile;
 
-
-
 UCLASS()
 class CHESS_API ABoard : public AActor
 {
@@ -22,6 +20,8 @@ public:
 	TArray<ATile*>& GetAllTiles() { return Tiles; }
 
 	void CapturePiece(class AChessPiece* PieceCaptured);
+
+	void UpdateTilesForTile(ATile* TileToUpdate);
 
 private:
 	// Sets default values for this actor's properties
@@ -51,6 +51,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AChessPiece> PawnPiece;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AChessPiece> KnightPiece;
 
 	TArray<ATile*> Tiles;
 

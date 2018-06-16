@@ -90,7 +90,7 @@ void ACustomPlayerController::OnLeftClick()
 				{
 					if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Capturing pawn"))
+						//UE_LOG(LogTemp, Warning, TEXT("Capturing pawn"))
 						CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), true);
 						ResetSelectedChessPieceTiles(Piece);
 						bPieceIsCapturing = true;
@@ -111,12 +111,12 @@ void ACustomPlayerController::OnLeftClick()
 				// Set new piece
 				CurrentChessPieceClicked = CurrentChessPieceHovered;
 
-				UE_LOG(LogTemp, Warning, TEXT("%i"), CurrentChessPieceClicked->GetAllPossibleTiles().Num())
+				//UE_LOG(LogTemp, Warning, TEXT("%i"), CurrentChessPieceClicked->GetAllPossibleTiles().Num())
 
 				// Set new blue tiles
 				UpdateSelectedChessPieceTiles();
 
-				UE_LOG(LogTemp, Warning, TEXT("Clicked on %s on Tile %s"), *CurrentChessPieceHovered->GetName(), *CurrentChessPieceHovered->GetCurrentTileName().ToString())
+				//UE_LOG(LogTemp, Warning, TEXT("Clicked on %s on Tile %s"), *CurrentChessPieceHovered->GetName(), *CurrentChessPieceHovered->GetCurrentTileName().ToString())
 			}
 		}
 	}
@@ -256,6 +256,8 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 {
 	if (CurrentChessPieceClicked)
 	{
+		GameBoard->UpdateTilesForTile(CurrentChessPieceClicked->GetCurrentTile());
+
 		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())
 		{
 			if (Tile->GetIsPossibleCaptureLocation())
@@ -270,5 +272,6 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 			Tile->SetIsPossibleMoveLocation(true);
 			CurrentPossibleMoveLocationTiles.Add(Tile);
 		}
+		//CurrentChessPieceClicked->GetCurrentTile()->SetAllTilesAroundBlue();
 	}
 }

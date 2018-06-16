@@ -24,170 +24,102 @@ void APawnPiece::Tick(float DeltaTime)
 
 TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 {
-	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	GameBoard = GameMode->GetGameBoard();
-
 	AllPossibleTiles.Empty();
 
-	TArray<ATile*> AllTiles;
-	if (GameBoard)
+	if (bIsWhite)
 	{
-		AllTiles = GameBoard->GetAllTiles();
-	}
-	int index = 0;
-
-	for (auto& Tile : AllTiles)
-	{
-		if (GetCurrentTile() == Tile)
+		if (CurrentTile->GetTileLeft())
 		{
-			int MaxSearch= 0;
+			if (!CurrentTile->GetTileLeft()->GetHasChessPiece())
+			{
+				AllPossibleTiles.Add(CurrentTile->GetTileLeft());
+			}
+
 			if (bIsFirstMove)
 			{
-				MaxSearch = 2;
-			}
-			else
-			{
-				MaxSearch = 1;
-			}
-			for (int i = 0; i <= MaxSearch; ++i)
-			{
-				// UP
-				//if (index - i >= 0 && index - i <= 63)
-				//{
-				//	if (!AllTiles[index - i]->GetHasChessPiece())
-				//	{
-				//		AllPossibleTiles.Add(AllTiles[index - i]);
-				//		UE_LOG(LogTemp, Warning, TEXT("UP: index(%i) - i(%i) = %i"), index, i, index - i)
-				//	}
-				//	else
-				//	{
-				//		UE_LOG(LogTemp, Warning, TEXT("UP: Cannot move here because tile %i is taken"), index - i)
-				//	}
-				//}
-
-				// DOWN
-				//if (index + i >= 0 && index + i <= 63)
-				//{
-				//	if (!AllTiles[index + i]->GetHasChessPiece())
-				//	{
-				//		AllPossibleTiles.Add(AllTiles[index + i]);
-				//		UE_LOG(LogTemp, Warning, TEXT("DOWN: index(%i) + i(%i) = %i"), index, i, index + i)
-				//	}
-				//	else
-				//	{
-				//		UE_LOG(LogTemp, Warning, TEXT("DOWN: Cannot move here because tile %i is taken"), index + i)
-				//	}
-				//}
-
-				if (bIsWhite)
+				if (CurrentTile->GetTileLeft()->GetTileLeft())
 				{
-					// LEFT
-					if (index + 8 * i >= 0 && index + 8 * i <= 63)
+					if (!CurrentTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
 					{
-						if (!AllTiles[index + 8 * i]->GetHasChessPiece())
-						{
-							AllPossibleTiles.Add(AllTiles[index + 8 * i]);
-							//UE_LOG(LogTemp, Warning, TEXT("LEFT: index(%i) + 8 * i(%i) = %i"), index, i, index + 8 * i)
-						}
-						else
-						{
-							//UE_LOG(LogTemp, Warning, TEXT("LEFT: Cannot move here because tile %i is taken"), (index + 8 * i))
-						}
-					}
-				}
-				else
-				{
-					// RIGHT
-					if (index - 8 * i >= 0 && index - 8 * i <= 63)
-					{
-						if (!AllTiles[index - 8 * i]->GetHasChessPiece())
-						{
-							AllPossibleTiles.Add(AllTiles[index - 8 * i]);
-							//UE_LOG(LogTemp, Warning, TEXT("RIGHT: index(%i) - 8 * i(%i) = %i"), index, i, index - 8 * i)
-						}
-						else
-						{
-							//UE_LOG(LogTemp, Warning, TEXT("RIGHT: Cannot move here because tile %i is taken"), (index - 8 * i))
-						}
+						AllPossibleTiles.Add(CurrentTile->GetTileLeft()->GetTileLeft());
 					}
 				}
 			}
-			break;
 		}
-		index++;
+	}
+	else
+	{
+		if (CurrentTile->GetTileRight())
+		{
+			if (!CurrentTile->GetTileRight()->GetHasChessPiece())
+			{
+				AllPossibleTiles.Add(CurrentTile->GetTileRight());
+			}
+
+			if (bIsFirstMove)
+			{
+				if (CurrentTile->GetTileRight()->GetTileRight())
+				{
+					if (!CurrentTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
+					{
+						AllPossibleTiles.Add(CurrentTile->GetTileRight()->GetTileRight());
+					}
+				}
+			}
+		}
 	}
 
 	if (bIsWhite)
 	{
 		// Diagonal Left
-		if (index + 7>= 0 && index + 7 <= 63)
+		if (CurrentTile->GetTileDiagonalLeftDown())
 		{
-			if (AllTiles[index + 7]->GetHasChessPiece())
+			if (CurrentTile->GetTileDiagonalLeftDown()->GetHasChessPiece())
 			{
-				if (AllTiles[index + 7]->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (CurrentTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
-					AllTiles[index + 7]->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(AllTiles[index + 7]);
-					//UE_LOG(LogTemp, Warning, TEXT("DIAGONAL LEFT: index(%i) + 7 = %i"), index, index + 7)
+					CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftDown());
 				}
-			}
-			else
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("LEFT: Cannot move here because tile %i is not taken"), (index + 7))
 			}
 		}
 		// Diagonal Right
-		if (index + 9 >= 0 && index + 9 <= 63)
+		if (CurrentTile->GetTileDiagonalLeftUp())
 		{
-			if (AllTiles[index + 9]->GetHasChessPiece())
+			if (CurrentTile->GetTileDiagonalLeftUp()->GetHasChessPiece())
 			{
-				if (AllTiles[index + 9]->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (CurrentTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
-					AllTiles[index + 9]->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(AllTiles[index + 9]);
-					//UE_LOG(LogTemp, Warning, TEXT("DIAGONAL LEFT: index(%i) + 9 = %i"), index, index + 9)
+					CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftUp());
 				}
-			}
-			else
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("LEFT: Cannot move here because tile %i is not taken"), (index + 9))
 			}
 		}
 	}
 	else
 	{
 		// Diagonal Left
-		if (index - 9 >= 0 && index - 9 <= 63)
+		if (CurrentTile->GetTileDiagonalRightUp())
 		{
-			if (AllTiles[index - 9]->GetHasChessPiece())
+			if (CurrentTile->GetTileDiagonalRightUp()->GetHasChessPiece())
 			{
-				if (AllTiles[index - 9]->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (CurrentTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
-					AllTiles[index - 9]->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(AllTiles[index - 9]);
-					//UE_LOG(LogTemp, Warning, TEXT("DIAGONAL LEFT: index(%i) - 9 = %i"), index, index - 9)
+					CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightUp());
 				}
-			}
-			else
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("DIAGONAL LEFT: Cannot move here because tile %i is not taken"), (index - 9))
 			}
 		}
 		// Diagonal Right
-		if (index - 7 >= 0 && index - 7 <= 63)
+		if (CurrentTile->GetTileDiagonalRightDown())
 		{
-			if (AllTiles[index - 7]->GetHasChessPiece())
+			if (CurrentTile->GetTileDiagonalRightDown()->GetHasChessPiece())
 			{
-				if (AllTiles[index - 7]->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (CurrentTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
-					AllTiles[index - 7]->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(AllTiles[index - 7]);
-					//UE_LOG(LogTemp, Warning, TEXT("DIAGONAL RIGHT: index(%i) - 7 = %i"), index, index - 7)
+					CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightDown());
 				}
-			}
-			else
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("LEFT: Cannot move here because tile %i is not taken"), (index - 7))
 			}
 		}
 	}

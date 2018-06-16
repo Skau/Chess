@@ -8,14 +8,6 @@
 
 class ATile;
 
-enum class EDirection
-{
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT
-};
-
 UCLASS()
 class CHESS_API AChessPiece : public AActor
 {

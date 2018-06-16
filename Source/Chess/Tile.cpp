@@ -84,6 +84,42 @@ void ATile::SetDefaultMaterial()
 	}
 }
 
+void ATile::SetAllTilesAroundBlue()
+{
+	if (TileUp)
+	{
+		TileUp->SetPossibleMoveMaterial();
+	}
+	if (TileDown)
+	{
+		TileDown->SetPossibleMoveMaterial();
+	}
+	if (TileLeft)
+	{
+		TileLeft->SetPossibleMoveMaterial();
+	}
+	if (TileRight)
+	{
+		TileRight->SetPossibleMoveMaterial();
+	}
+	if (TileDiagonalRightUp)
+	{
+		TileDiagonalRightUp->SetPossibleMoveMaterial();
+	}
+	if (TileDiagonalLeftUp)
+	{
+		TileDiagonalLeftUp->SetPossibleMoveMaterial();
+	}
+	if (TileDiagonalRightDown)
+	{
+		TileDiagonalRightDown->SetPossibleMoveMaterial();
+	}
+	if (TileDiagonalLeftDown)
+	{
+		TileDiagonalLeftDown->SetPossibleMoveMaterial();
+	}
+}
+
 void ATile::SetDarkMaterial()
 {
 	if (DarkMaterial && Mesh->GetMaterial(0) != DarkMaterial)
@@ -91,4 +127,18 @@ void ATile::SetDarkMaterial()
 		Mesh->SetMaterial(0, DarkMaterial);
 		bIsDarkMaterial = true;
 	}
+}
+
+TArray<ATile*>& ATile::GetAllTilesInADirection(ATile * StartTile, EDirection Direction)
+{
+	AllTilesInADirection.Empty();
+
+	return AllTilesInADirection;
+}
+
+ATile* ATile::GetSingleTile(ATile * StartTile, EDirection Direction, int NumberOfTilesAway)
+{
+	ATile* TileToReturn = nullptr;
+
+	return TileToReturn;
 }
