@@ -138,8 +138,6 @@ void ACustomPlayerController::OnLeftClick()
 					{
 						CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
 					}
-
-
 					ResetSelectedChessPieceTiles();
 
 					UpdateSelectedChessPieceTiles();
@@ -256,6 +254,7 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 {
 	if (CurrentChessPieceClicked)
 	{
+		CurrentPossibleMoveLocationTiles.Empty();
 		GameBoard->UpdateTilesForTile(CurrentChessPieceClicked->GetCurrentTile());
 
 		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())

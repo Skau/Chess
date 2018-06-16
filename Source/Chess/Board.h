@@ -23,6 +23,15 @@ public:
 
 	void UpdateTilesForTile(ATile* TileToUpdate);
 
+	TArray<ATile*>& GetAllTilesUp(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesDown(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesLeft(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesRight(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
+
 private:
 	// Sets default values for this actor's properties
 	ABoard();
@@ -55,7 +64,12 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AChessPiece> KnightPiece;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AChessPiece> BishopPiece;
+
 	TArray<ATile*> Tiles;
+
+	TArray<ATile*> TilesToReturn;
 
 	TArray<AChessPiece*> ChessPieces;
 

@@ -2,6 +2,10 @@
 
 #include "Tile.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "ChessGameModeBase.h"
+#include "Board.h"
 
 // Sets default values
 ATile::ATile()
@@ -132,6 +136,64 @@ void ATile::SetDarkMaterial()
 TArray<ATile*>& ATile::GetAllTilesInADirection(ATile * StartTile, EDirection Direction)
 {
 	AllTilesInADirection.Empty();
+
+	auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	auto GameBoard = GameMode->GetGameBoard();
+
+	switch (Direction)
+	{
+	case EDirection::UP:
+		for (auto& TileToAdd : GameBoard->GetAllTilesUp(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::DOWN:
+		for (auto& TileToAdd : GameBoard->GetAllTilesDown(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::LEFT:
+		for (auto& TileToAdd : GameBoard->GetAllTilesLeft(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::RIGHT:
+		for (auto& TileToAdd : GameBoard->GetAllTilesRight(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::DIARIGHTUP:
+		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightUp(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::DIARIGHTDOWN:
+		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightDown(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::DIALEFTUP:
+		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftUp(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	case EDirection::DIALEFTDOWN:
+		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftDown(StartTile))
+		{
+			AllTilesInADirection.Add(TileToAdd);
+		}
+		break;
+	default:
+		break;
+	}
+	
 
 	return AllTilesInADirection;
 }

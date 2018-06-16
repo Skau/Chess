@@ -33,15 +33,15 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			if (!CurrentTile->GetTileLeft()->GetHasChessPiece())
 			{
 				AllPossibleTiles.Add(CurrentTile->GetTileLeft());
-			}
 
-			if (bIsFirstMove)
-			{
-				if (CurrentTile->GetTileLeft()->GetTileLeft())
+				if (bIsFirstMove)
 				{
-					if (!CurrentTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+					if (CurrentTile->GetTileLeft()->GetTileLeft())
 					{
-						AllPossibleTiles.Add(CurrentTile->GetTileLeft()->GetTileLeft());
+						if (!CurrentTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+						{
+							AllPossibleTiles.Add(CurrentTile->GetTileLeft()->GetTileLeft());
+						}
 					}
 				}
 			}
@@ -54,15 +54,15 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			if (!CurrentTile->GetTileRight()->GetHasChessPiece())
 			{
 				AllPossibleTiles.Add(CurrentTile->GetTileRight());
-			}
 
-			if (bIsFirstMove)
-			{
-				if (CurrentTile->GetTileRight()->GetTileRight())
+				if (bIsFirstMove)
 				{
-					if (!CurrentTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
+					if (CurrentTile->GetTileRight()->GetTileRight())
 					{
-						AllPossibleTiles.Add(CurrentTile->GetTileRight()->GetTileRight());
+						if (!CurrentTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
+						{
+							AllPossibleTiles.Add(CurrentTile->GetTileRight()->GetTileRight());
+						}
 					}
 				}
 			}
