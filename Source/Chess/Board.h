@@ -27,27 +27,6 @@ public:
 	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
 
-	UPROPERTY(BlueprintReadWrite)
-	int BlackPawnsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int BlackRooksLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int BlackKnightsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int BlackBishopsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int BlackQueenLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int WhitePawnsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int WhiteRooksLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int WhiteKnightsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int WhiteBishopsLost = 0;
-	UPROPERTY(BlueprintReadWrite)
-	int WhiteQueenLost = 0;
-
 private:
 	// Sets default values for this actor's properties
 	ABoard();

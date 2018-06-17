@@ -33,6 +33,38 @@ public:
 
 	void ToggleTurn();
 
+	void IncrementBlackPawnsLost() { BlackPawnsLost++; }
+	void IncrementBlackRooksLost() { BlackRooksLost++; }
+	void IncrementBlackKnightsLost() { BlackKnightsLost++; }
+	void IncrementBlackBishopsLost() { BlackBishopsLost++; }
+	void SetBlackQueenLost() { BlackQueenLost = 1; }
+	void IncrementWhitePawnsLost() { WhitePawnsLost++; }
+	void IncrementWhiteRooksLost() { WhiteRooksLost++; }
+	void IncrementWhiteKnightsLost() { WhiteKnightsLost++; }
+	void IncrementWhiteBishopsLost() { WhiteBishopsLost++; }
+	void SetWhiteQueenLost() { WhiteQueenLost = 1; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetBlackPawnsLost() { return BlackPawnsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetBlackRooksLost() { return BlackRooksLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetBlackKnightsLost() { return BlackKnightsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetBlackBishopsLost() { return BlackBishopsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetBlackQueenLost() { return BlackQueenLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetWhitePawnsLost() { return WhitePawnsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetWhiteRooksLost() { return WhiteRooksLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetWhiteKnightsLost() { return WhiteKnightsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetWhiteBishopsLost() { return WhiteBishopsLost; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetWhiteQueenLost() { return WhiteQueenLost; }
+
 private:
 	AChessGameModeBase();
 
@@ -50,4 +82,15 @@ private:
 	bool bGameIsOver = false;
 
 	bool bWhiteWon = false;
+
+	int BlackPawnsLost = 0;
+	int BlackRooksLost = 0;
+	int BlackKnightsLost = 0;
+	int BlackBishopsLost = 0;
+	int BlackQueenLost = 0;
+	int WhitePawnsLost = 0;
+	int WhiteRooksLost = 0;
+	int WhiteKnightsLost = 0;
+	int WhiteBishopsLost = 0;
+	int WhiteQueenLost = 0;
 };

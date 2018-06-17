@@ -38,8 +38,6 @@ void ABoard::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnTilesAndChessPieces();
-
-
 }
 
 // Called every frame
@@ -412,85 +410,88 @@ void ABoard::CapturePiece(AChessPiece * PieceCaptured)
 {
 	if (PieceCaptured)
 	{
-		//auto Type = PieceCaptured->GetPieceType();
-
-		//switch (Type)
+		//auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		//if (GameMode)
 		//{
-		//case EPieceType::Pawn:
-		//{
-		//	if (PieceCaptured->GetIsWhite())
+		//	auto Type = PieceCaptured->GetPieceType();
+		//	switch (Type)
 		//	{
-		//		WhitePawnsLost++;
-		//	}
-		//	else
+		//	case EPieceType::Pawn:
 		//	{
-		//		BlackPawnsLost++;
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->IncrementWhitePawnsLost();
+		//		}
+		//		else
+		//		{
+		//			GameMode->IncrementBlackPawnsLost();
+		//		}
+		//		break;
 		//	}
-		//	break;
-		//}
-		//case EPieceType::Rook:
-		//{
-		//	if (PieceCaptured->GetIsWhite())
+		//	case EPieceType::Rook:
 		//	{
-		//		WhiteRooksLost++;
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->IncrementWhiteRooksLost();
+		//		}
+		//		else
+		//		{
+		//			GameMode->IncrementBlackRooksLost();
+		//		}
+		//		break;
 		//	}
-		//	else
+		//	case EPieceType::Knight:
 		//	{
-		//		BlackRooksLost++;
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->IncrementWhiteKnightsLost();
+		//		}
+		//		else
+		//		{
+		//			GameMode->IncrementBlackKnightsLost();
+		//		}
+		//		break;
 		//	}
-		//	break;
-		//}
-		//case EPieceType::Knight:
-		//{
-		//	if (PieceCaptured->GetIsWhite())
+		//	case EPieceType::Bishop:
 		//	{
-		//		WhiteKnightsLost++;
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->IncrementWhiteBishopsLost();
+		//		}
+		//		else
+		//		{
+		//			GameMode->IncrementBlackBishopsLost();
+		//		}
+		//		break;
 		//	}
-		//	else
+		//	case EPieceType::King:
 		//	{
-		//		BlackKnightsLost++;
+		//		auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->SetGameIsOver(true);
+		//		}
+		//		else
+		//		{
+		//			GameMode->SetGameIsOver(false);
+		//		}
+		//		break;
 		//	}
-		//	break;
-		//}
-		//case EPieceType::Bishop:
-		//{
-		//	if (PieceCaptured->GetIsWhite())
+		//	case EPieceType::Queen:
 		//	{
-		//		WhiteBishopsLost++;
+		//		if (PieceCaptured->GetIsWhite())
+		//		{
+		//			GameMode->SetWhiteQueenLost();
+		//		}
+		//		else
+		//		{
+		//			GameMode->SetBlackQueenLost();
+		//		}
+		//		break;
 		//	}
-		//	else
-		//	{
-		//		BlackBishopsLost++;
+		//	default:
+		//		break;
 		//	}
-		//	break;
-		//}
-		//case EPieceType::King:
-		//{
-		//	auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-		//	if (PieceCaptured->GetIsWhite())
-		//	{
-		//		GameMode->SetGameIsOver(true);
-		//	}
-		//	else
-		//	{
-		//		GameMode->SetGameIsOver(false);
-		//	}
-		//	break;
-		//}
-		//case EPieceType::Queen:
-		//{
-		//	if (PieceCaptured->GetIsWhite())
-		//	{
-		//		WhiteQueenLost = 1;
-		//	}
-		//	else
-		//	{
-		//		BlackQueenLost = 1;
-		//	}
-		//	break;
-		//}
-		//default:
-		//	break;
 		//}
 		PieceCaptured->Destroy();
 	}

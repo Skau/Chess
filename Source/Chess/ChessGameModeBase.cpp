@@ -15,6 +15,16 @@ void AChessGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BlackPawnsLost = 0;
+	BlackRooksLost = 0;
+	BlackKnightsLost = 0;
+	BlackBishopsLost = 0;
+	BlackQueenLost = 0;
+	WhitePawnsLost = 0;
+	WhiteRooksLost = 0;
+	WhiteKnightsLost = 0;
+	WhiteBishopsLost = 0;
+	WhiteQueenLost = 0;
 }
 
 void AChessGameModeBase::Tick(float DeltaTime)
