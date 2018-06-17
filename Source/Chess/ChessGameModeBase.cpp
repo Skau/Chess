@@ -15,6 +15,15 @@ void AChessGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AChessGameModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AChessGameModeBase::StartGame()
+{
 	FActorSpawnParameters SpawnParameters;
 
 	GameBoard = GetWorld()->SpawnActor<ABoard>(Board, SpawnParameters);
@@ -24,7 +33,14 @@ void AChessGameModeBase::BeginPlay()
 	}
 }
 
-void AChessGameModeBase::Tick(float DeltaTime)
+void AChessGameModeBase::ToggleTurn()
 {
-	Super::Tick(DeltaTime);
+	if (bIsWhiteTurn)
+	{
+		bIsWhiteTurn = false;
+	}
+	else
+	{
+		bIsWhiteTurn = true;
+	}
 }

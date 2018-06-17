@@ -8,13 +8,23 @@
 
 class ATile;
 
+enum class EPieceType 
+{
+	Pawn,
+	Rook,
+	Knight,
+	Bishop,
+	King,
+	Queen,
+	None
+};
+
 UCLASS()
 class CHESS_API AChessPiece : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-
 	void SetWhiteMaterial();
 
 	void SetWhiteMaterialHighlighted();
@@ -36,6 +46,10 @@ public:
 	virtual TArray<ATile*>& GetAllPossibleTiles();
 
 	void MoveToNewTile(ATile * NewTile, bool WillCapturePiece = false);
+	
+	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
+
+	EPieceType GetPieceType() { return Type; }
 
 protected:
 	// Sets default values for this actor's properties
@@ -70,4 +84,6 @@ protected:
 	class ABoard* GameBoard = nullptr;
 
 	bool bIsFirstMove = true;
+
+	EPieceType Type = EPieceType::None;
 };

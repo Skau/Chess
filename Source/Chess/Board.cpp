@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Tile.h"
 #include "ChessGameModeBase.h"
+#include "ChessPiece.h"
 #include "PawnPiece.h"
 #include "KnightPiece.h"
 #include "BishopPiece.h"
@@ -112,7 +113,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ARookPiece>(
 						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Rook);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -123,7 +124,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Knight);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -134,7 +135,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ABishopPiece>(
 						BishopPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Bishop);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -145,7 +146,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AQueenPiece>(
 						QueenPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Queen);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -156,7 +157,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKingPiece>(
 						KingPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::King);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -167,7 +168,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ABishopPiece>(
 						BishopPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Bishop);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -178,7 +179,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Knight);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -189,7 +190,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ARookPiece>(
 						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Rook);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -200,11 +201,9 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<APawnPiece>(
 						PawnPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
-
+					piece->SetPieceType(EPieceType::Pawn);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
-
-					//ChessPieces.Add(piece);
 				}
 			}
 			else if (i > 47)
@@ -215,7 +214,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ARookPiece>(
 						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Rook);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -226,7 +225,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Knight);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -237,7 +236,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ABishopPiece>(
 						BishopPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Bishop);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -248,7 +247,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKingPiece>(
 						KingPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::King);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -259,7 +258,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AQueenPiece>(
 						QueenPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Queen);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -270,7 +269,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ABishopPiece>(
 						BishopPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Bishop);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -281,7 +280,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Knight);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -292,7 +291,7 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<ARookPiece>(
 						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Rook);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
 				}
@@ -303,11 +302,9 @@ void ABoard::SpawnTilesAndChessPieces()
 					auto piece = GetWorld()->SpawnActor<APawnPiece>(
 						PawnPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
-
+					piece->SetPieceType(EPieceType::Pawn);
 					piece->SetCurrentTile(Tile);
 					Tile->SetChessPice(piece);
-
-					//ChessPieces.Add(piece);
 				}
 			}
 		}
@@ -320,7 +317,6 @@ void ABoard::SpawnTilesAndChessPieces()
 					// Bottom Tiles
 					if ((i == 7 || i == 15 || i == 23 || i == 31 || i == 39 || i == 47 || i == 55 || i == 63))
 					{
-						UE_LOG(LogTemp, Warning, TEXT("TileDown SetNullptr"))
 						Tiles[i]->SetTileDown(nullptr);
 						Tiles[i]->SetTileDiagonalLeftDown(nullptr);
 						Tiles[i]->SetTileDiagonalRightDown(nullptr);
@@ -355,7 +351,6 @@ void ABoard::SpawnTilesAndChessPieces()
 					// Top tiles
 					if ((i == 8 || i == 16 || i == 24 || i == 32 || i == 40 || i == 48 || i == 56 || i == 64))
 					{
-						UE_LOG(LogTemp, Warning, TEXT("TileDown SetNullptr"))
 						Tiles[i]->SetTileUp(nullptr);
 						Tiles[i]->SetTileDiagonalRightUp(nullptr);
 						Tiles[i]->SetTileDiagonalLeftUp(nullptr);
@@ -368,8 +363,7 @@ void ABoard::SpawnTilesAndChessPieces()
 							{
 								if (i % 8 == 0)
 								{
-									UE_LOG(LogTemp, Warning, TEXT("TileUp SetNullptr"))
-										Tiles[i]->SetTileUp(nullptr);
+									Tiles[i]->SetTileUp(nullptr);
 								}
 								else
 								{
@@ -418,19 +412,88 @@ void ABoard::CapturePiece(AChessPiece * PieceCaptured)
 {
 	if (PieceCaptured)
 	{
+		//auto Type = PieceCaptured->GetPieceType();
+
+		//switch (Type)
+		//{
+		//case EPieceType::Pawn:
+		//{
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		WhitePawnsLost++;
+		//	}
+		//	else
+		//	{
+		//		BlackPawnsLost++;
+		//	}
+		//	break;
+		//}
+		//case EPieceType::Rook:
+		//{
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		WhiteRooksLost++;
+		//	}
+		//	else
+		//	{
+		//		BlackRooksLost++;
+		//	}
+		//	break;
+		//}
+		//case EPieceType::Knight:
+		//{
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		WhiteKnightsLost++;
+		//	}
+		//	else
+		//	{
+		//		BlackKnightsLost++;
+		//	}
+		//	break;
+		//}
+		//case EPieceType::Bishop:
+		//{
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		WhiteBishopsLost++;
+		//	}
+		//	else
+		//	{
+		//		BlackBishopsLost++;
+		//	}
+		//	break;
+		//}
+		//case EPieceType::King:
+		//{
+		//	auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		GameMode->SetGameIsOver(true);
+		//	}
+		//	else
+		//	{
+		//		GameMode->SetGameIsOver(false);
+		//	}
+		//	break;
+		//}
+		//case EPieceType::Queen:
+		//{
+		//	if (PieceCaptured->GetIsWhite())
+		//	{
+		//		WhiteQueenLost = 1;
+		//	}
+		//	else
+		//	{
+		//		BlackQueenLost = 1;
+		//	}
+		//	break;
+		//}
+		//default:
+		//	break;
+		//}
 		PieceCaptured->Destroy();
 	}
-}
-
-ATile* ABoard::GetTileUnderCursor(FVector CursorLocation)
-{
-	ATile* TileToReturn = nullptr;
-	return TileToReturn;
-}
-
-void ABoard::UpdateTilesForTile(ATile* TileToUpdate)
-{
-
 }
 
 TArray<ATile*>& ABoard::GetAllTilesUp(ATile* StartingTile)

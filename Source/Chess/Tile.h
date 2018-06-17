@@ -144,5 +144,4 @@ private:
 	ATile* TileDiagonalLeftDown = nullptr;
 
 	TArray<ATile*> AllTilesInADirection;
-
 };

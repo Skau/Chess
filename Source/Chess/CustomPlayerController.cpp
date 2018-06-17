@@ -17,10 +17,10 @@ ACustomPlayerController::ACustomPlayerController()
 
 void ACustomPlayerController::BeginPlay()
 {
-	Super::BeginPlay();
+Super::BeginPlay();
 
-	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	GameBoard = GameMode->GetGameBoard();
+GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+GameBoard = GameMode->GetGameBoard();
 }
 
 void ACustomPlayerController::Tick(float DeltaTime)
@@ -83,40 +83,41 @@ void ACustomPlayerController::OnLeftClick()
 		// If hovering over piece
 		if (CurrentChessPieceHovered)
 		{
-			if (CurrentChessPieceClicked && !bPieceIsCapturing)
+			if (CurrentChessPieceClicked)
 			{
-				auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
-				if (Piece)
+				if (!bPieceIsCapturing)
 				{
-					if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+					auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
+					if (Piece)
 					{
-						//UE_LOG(LogTemp, Warning, TEXT("Capturing pawn"))
-						CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), true);
-						ResetSelectedChessPieceTiles(Piece);
-						bPieceIsCapturing = true;
+						if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+						{
+							CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), true);
+							ResetSelectedChessPieceTiles(Piece);
+							bPieceIsCapturing = true;
+							GameMode->ToggleTurn();
+						}
 					}
 				}
 			}
-			else
-			{
-				CurrentChessPieceClicked = Cast<AChessPiece>(CursorHitResult.Actor);
-				bPieceIsCapturing = false;
-			}
 
-			if (!bPieceIsCapturing)
+			// Set new piece
+			if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
 			{
 				// Resets tiles and deselects piece in case one is already pressed
 				ResetSelectedChessPieceTiles();
 
-				// Set new piece
 				CurrentChessPieceClicked = CurrentChessPieceHovered;
-
-				//UE_LOG(LogTemp, Warning, TEXT("%i"), CurrentChessPieceClicked->GetAllPossibleTiles().Num())
 
 				// Set new blue tiles
 				UpdateSelectedChessPieceTiles();
 
-				//UE_LOG(LogTemp, Warning, TEXT("Clicked on %s on Tile %s"), *CurrentChessPieceHovered->GetName(), *CurrentChessPieceHovered->GetCurrentTileName().ToString())
+				if (bPieceIsCapturing)
+				{
+					ResetSelectedChessPieceTiles();
+
+					UpdateSelectedChessPieceTiles();
+				}
 			}
 		}
 	}
@@ -130,17 +131,22 @@ void ACustomPlayerController::OnLeftClick()
 				// If a piece is selected
 				if (CurrentChessPieceClicked)
 				{
-					if (CurrentHoveredTile->GetIsPossibleCaptureLocation())
+					if (CurrentChessPieceClicked->GetIsWhite() == GameMode->GetIsWhiteTurn())
 					{
-						CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile, true);
-					}
-					else if(CurrentHoveredTile->GetIsPossibleMoveLocation())
-					{
-						CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
-					}
-					ResetSelectedChessPieceTiles();
+						if (CurrentHoveredTile->GetIsPossibleCaptureLocation())
+						{
+							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile, true);
+							GameMode->ToggleTurn();
+						}
+						else if (CurrentHoveredTile->GetIsPossibleMoveLocation())
+						{
+							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
+							GameMode->ToggleTurn();
+						}
+						ResetSelectedChessPieceTiles();
 
-					UpdateSelectedChessPieceTiles();
+						UpdateSelectedChessPieceTiles();
+					}
 				}
 			}
 		}
@@ -246,6 +252,7 @@ void ACustomPlayerController::ResetSelectedChessPieceTiles(AChessPiece* ChessPie
 	{
 		CurrentChessPieceClicked->SetDefaultMaterial();
 		CurrentChessPieceClicked = nullptr;
+		bPieceIsCapturing = false;
 	}
 }
 
@@ -270,6 +277,5 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 			Tile->SetIsPossibleMoveLocation(true);
 			CurrentPossibleMoveLocationTiles.Add(Tile);
 		}
-		//CurrentChessPieceClicked->GetCurrentTile()->SetAllTilesAroundBlue();
 	}
 }

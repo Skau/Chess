@@ -14,14 +14,9 @@ class CHESS_API ABoard : public AActor
 	GENERATED_BODY()
 	
 public:
-
-	ATile* GetTileUnderCursor(FVector CursorLocation);
-
 	TArray<ATile*>& GetAllTiles() { return Tiles; }
 
 	void CapturePiece(class AChessPiece* PieceCaptured);
-
-	void UpdateTilesForTile(ATile* TileToUpdate);
 
 	TArray<ATile*>& GetAllTilesUp(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDown(ATile* StartingTile);
@@ -31,6 +26,27 @@ public:
 	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
+
+	UPROPERTY(BlueprintReadWrite)
+	int BlackPawnsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int BlackRooksLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int BlackKnightsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int BlackBishopsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int BlackQueenLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int WhitePawnsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int WhiteRooksLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int WhiteKnightsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int WhiteBishopsLost = 0;
+	UPROPERTY(BlueprintReadWrite)
+	int WhiteQueenLost = 0;
 
 private:
 	// Sets default values for this actor's properties
@@ -81,5 +97,4 @@ private:
 	TArray<AChessPiece*> ChessPieces;
 
 	FVector CursorWorldLocation = FVector(0);
-	
 };
