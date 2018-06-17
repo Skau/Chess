@@ -62,10 +62,6 @@ public:
 
 	FVector GetChessPieceLocation() { UE_LOG(LogTemp, Warning, TEXT("%s"), *ChessPieceLocation.ToString()) return ChessPieceLocation; }
 
-	int GetRow() { return Row; }
-
-	void SetRow(int RowIn) { Row = RowIn; }
-
 	TArray<ATile*>& GetAllTilesInADirection(ATile* StartTile, EDirection Direction);
 
 	ATile* GetSingleTile(ATile* StartTile, EDirection Direction, int NumberOfTilesAway);
@@ -129,8 +125,6 @@ private:
 	bool bIsPossibleMoveLocation = false;
 
 	bool bIsPossibleCaptureLocation = false;
-
-	int Row = 0;
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* TileUp = nullptr;

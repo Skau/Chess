@@ -42,9 +42,7 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnTiles();
-
-	void SetTileRows();
+	void SpawnTilesAndChessPieces();
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh = nullptr;

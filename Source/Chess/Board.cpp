@@ -36,7 +36,7 @@ void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnTiles();
+	SpawnTilesAndChessPieces();
 
 
 }
@@ -48,7 +48,7 @@ void ABoard::Tick(float DeltaTime)
 
 }
 
-void ABoard::SpawnTiles()
+void ABoard::SpawnTilesAndChessPieces()
 {
 	bool bUseLightMaterial = true;
 
@@ -100,7 +100,6 @@ void ABoard::SpawnTiles()
 			Tile->SetName(FName(*(FString("Tile") + FString::FromInt(i))));
 			Tile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			Tile->index = i;
-			//UpdateTilesForTile(Tile);
 			Tiles.Add(Tile);
 
 			FVector SpawnLocation = FVector(0);
@@ -411,46 +410,6 @@ void ABoard::SpawnTiles()
 					}
 				}
 			}
-		}
-	}
-}
-
-void ABoard::SetTileRows()
-{
-	int index = 0;
-	for (auto& Tile : Tiles)
-	{
-		if (index >= 0 && index <= 8)
-		{
-			Tile->SetRow(1);
-		}
-		else if (index >= 9 && index <= 16)
-		{
-			Tile->SetRow(2);
-		}
-		else if (index >= 17 && index <= 24)
-		{
-			Tile->SetRow(3);
-		}
-		else if (index >= 25 && index <= 32)
-		{
-			Tile->SetRow(4);
-		}
-		else if (index >= 33 && index <= 40)
-		{
-			Tile->SetRow(5);
-		}
-		else if (index >= 41 && index <= 48)
-		{
-			Tile->SetRow(6);
-		}
-		else if (index >= 49 && index <= 56)
-		{
-			Tile->SetRow(7);
-		}
-		else if (index >= 57 && index <= 63)
-		{
-			Tile->SetRow(8);
 		}
 	}
 }
