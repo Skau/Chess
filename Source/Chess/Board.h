@@ -67,6 +67,15 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AChessPiece> BishopPiece;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AChessPiece> QueenPiece;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AChessPiece> KingPiece;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AChessPiece> RookPiece;
+
 	TArray<ATile*> Tiles;
 
 	TArray<ATile*> TilesToReturn;

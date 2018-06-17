@@ -7,21 +7,54 @@ TArray<ATile*>& AKnightPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();
 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP))
+	if (CurrentTile->GetTileDiagonalRightUp())
 	{
-		PossibleTilesToMove.Add(Tile);
+		if (CurrentTile->GetTileDiagonalRightUp()->GetTileUp())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightUp()->GetTileUp());
+		}
+
+		if (CurrentTile->GetTileDiagonalRightUp()->GetTileRight())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightUp()->GetTileRight());
+		}
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN))
+	if (CurrentTile->GetTileDiagonalRightDown())
 	{
-		PossibleTilesToMove.Add(Tile);
+		if (CurrentTile->GetTileDiagonalRightDown()->GetTileDown())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightDown()->GetTileDown());
+		}
+
+		if (CurrentTile->GetTileDiagonalRightDown()->GetTileRight())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightDown()->GetTileRight());
+		}
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT))
+	if (CurrentTile->GetTileDiagonalLeftUp())
 	{
-		PossibleTilesToMove.Add(Tile);
+		if (CurrentTile->GetTileDiagonalLeftUp()->GetTileUp())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftUp()->GetTileUp());
+		}
+
+		if (CurrentTile->GetTileDiagonalLeftUp()->GetTileUp())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftUp()->GetTileUp());
+		}
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT))
+	if (CurrentTile->GetTileDiagonalLeftDown())
 	{
-		PossibleTilesToMove.Add(Tile);
+		if (CurrentTile->GetTileDiagonalLeftDown()->GetTileDown())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftDown()->GetTileDown());
+		}
+
+		if (CurrentTile->GetTileDiagonalLeftDown()->GetTileDown())
+		{
+			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftDown()->GetTileDown());
+		}
 	}
+
 	return PossibleTilesToMove;
 }

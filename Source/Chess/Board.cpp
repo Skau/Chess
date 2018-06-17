@@ -9,6 +9,9 @@
 #include "PawnPiece.h"
 #include "KnightPiece.h"
 #include "BishopPiece.h"
+#include "QueenPiece.h"
+#include "RookPiece.h"
+#include "KingPiece.h"
 
 // Sets default values
 ABoard::ABoard()
@@ -107,6 +110,17 @@ void ABoard::SpawnTiles()
 				if (i == 0)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<ARookPiece>(
+						RookPiece, SpawnLocation, FRotator(0));
+					piece->SetWhiteMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 1)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
@@ -126,6 +140,28 @@ void ABoard::SpawnTiles()
 					Tile->SetChessPice(piece);
 				}
 
+				if (i == 3)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<AQueenPiece>(
+						QueenPiece, SpawnLocation, FRotator(0));
+					piece->SetWhiteMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 4)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<AKingPiece>(
+						KingPiece, SpawnLocation, FRotator(0));
+					piece->SetWhiteMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
 				if (i == 5)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
@@ -137,11 +173,22 @@ void ABoard::SpawnTiles()
 					Tile->SetChessPice(piece);
 				}
 
-				if (i == 7)
+				if (i == 6)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
+					piece->SetWhiteMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 7)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<ARookPiece>(
+						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetWhiteMaterial();
 
 					piece->SetCurrentTile(Tile);
@@ -166,6 +213,17 @@ void ABoard::SpawnTiles()
 				if (i == 63)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<ARookPiece>(
+						RookPiece, SpawnLocation, FRotator(0));
+					piece->SetBlackMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 62)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
@@ -185,6 +243,28 @@ void ABoard::SpawnTiles()
 					Tile->SetChessPice(piece);
 				}
 
+				if (i == 60)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<AKingPiece>(
+						KingPiece, SpawnLocation, FRotator(0));
+					piece->SetBlackMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 59)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<AQueenPiece>(
+						QueenPiece, SpawnLocation, FRotator(0));
+					piece->SetBlackMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
 				if (i == 58)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
@@ -196,11 +276,22 @@ void ABoard::SpawnTiles()
 					Tile->SetChessPice(piece);
 				}
 
-				if (i == 56)
+				if (i == 57)
 				{
 					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
 					auto piece = GetWorld()->SpawnActor<AKnightPiece>(
 						KnightPiece, SpawnLocation, FRotator(0));
+					piece->SetBlackMaterial();
+
+					piece->SetCurrentTile(Tile);
+					Tile->SetChessPice(piece);
+				}
+
+				if (i == 56)
+				{
+					SpawnLocation = FVector(Tiles[i]->GetActorLocation().X, Tiles[i]->GetActorLocation().Y, 20);
+					auto piece = GetWorld()->SpawnActor<ARookPiece>(
+						RookPiece, SpawnLocation, FRotator(0));
 					piece->SetBlackMaterial();
 
 					piece->SetCurrentTile(Tile);
