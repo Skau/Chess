@@ -88,6 +88,9 @@ public:
 	ATile* GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
 	ATile* GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
 
+	UPROPERTY(VisibleAnywhere)
+	int index = 0;
+
 private:
 	// Sets default values for this actor's properties
 	ATile();
@@ -129,13 +132,21 @@ private:
 
 	int Row = 0;
 
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileUp = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileDown = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileLeft = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileRight = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileDiagonalRightUp = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileDiagonalLeftUp = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileDiagonalRightDown = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileDiagonalLeftDown = nullptr;
 
 	TArray<ATile*> AllTilesInADirection;

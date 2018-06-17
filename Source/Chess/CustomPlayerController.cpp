@@ -255,7 +255,6 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 	if (CurrentChessPieceClicked)
 	{
 		CurrentPossibleMoveLocationTiles.Empty();
-		GameBoard->UpdateTilesForTile(CurrentChessPieceClicked->GetCurrentTile());
 
 		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())
 		{

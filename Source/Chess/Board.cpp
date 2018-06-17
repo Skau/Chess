@@ -2,8 +2,10 @@
 
 #include "Board.h"
 #include "Engine/World.h"
+#include "Kismet/Gameplaystatics.h"
 #include "Components/StaticMeshComponent.h"
 #include "Tile.h"
+#include "ChessGameModeBase.h"
 #include "PawnPiece.h"
 #include "KnightPiece.h"
 #include "BishopPiece.h"
@@ -94,6 +96,8 @@ void ABoard::SpawnTiles()
 			Tile->SetActorRelativeLocation(SpawnLocation);
 			Tile->SetName(FName(*(FString("Tile") + FString::FromInt(i))));
 			Tile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			Tile->index = i;
+			//UpdateTilesForTile(Tile);
 			Tiles.Add(Tile);
 
 			FVector SpawnLocation = FVector(0);
@@ -217,65 +221,102 @@ void ABoard::SpawnTiles()
 				}
 			}
 		}
-
 		if (Tiles.Num())
 		{
-			for (int i = 0; i < 64; ++i)
+			for (int i = 0; i <= 63; ++i)
 			{
-				if (i + 1 >= 0 && i + 1 <= 63)
+				if (Tiles[i])
 				{
-					if (Tiles[i + 1])
+					// Bottom Tiles
+					if ((i == 7 || i == 15 || i == 23 || i == 31 || i == 39 || i == 47 || i == 55 || i == 63))
 					{
-						Tiles[i]->SetTileDown(Tiles[i + 1]);
+						UE_LOG(LogTemp, Warning, TEXT("TileDown SetNullptr"))
+						Tiles[i]->SetTileDown(nullptr);
+						Tiles[i]->SetTileDiagonalLeftDown(nullptr);
+						Tiles[i]->SetTileDiagonalRightDown(nullptr);
 					}
-				}
-				if (i - 1 >= 0 && i - 1 <= 63)
-				{
-					if (Tiles[i - 1])
+					else
 					{
-						Tiles[i]->SetTileUp(Tiles[i - 1]);
+						if (i + 1 >= 0 && i + 1 <= 63)
+						{
+							if (Tiles[i + 1])
+							{
+								Tiles[i]->SetTileDown(Tiles[i + 1]);
+							}
+						}
+
+						if (i + 9 >= 0 && i + 9 <= 63)
+						{
+							if (Tiles[i + 9])
+							{
+								Tiles[i]->SetTileDiagonalLeftDown(Tiles[i + 9]);
+							}
+						}
+
+						if (i - 7 >= 0 && i - 7 <= 63)
+						{
+							if (Tiles[i - 7])
+							{
+								Tiles[i]->SetTileDiagonalRightDown(Tiles[i - 7]);
+							}
+						}
 					}
-				}
-				if (i + 8 >= 0 && i + 8 <= 63)
-				{
-					if (Tiles[i + 8])
+
+					// Top tiles
+					if ((i == 8 || i == 16 || i == 24 || i == 32 || i == 40 || i == 48 || i == 56 || i == 64))
 					{
-						Tiles[i]->SetTileLeft(Tiles[i + 8]);
+						UE_LOG(LogTemp, Warning, TEXT("TileDown SetNullptr"))
+						Tiles[i]->SetTileUp(nullptr);
+						Tiles[i]->SetTileDiagonalRightUp(nullptr);
+						Tiles[i]->SetTileDiagonalLeftUp(nullptr);
 					}
-				}
-				if (i - 8 >= 0 && i - 8 <= 63)
-				{
-					if (Tiles[i - 8])
+					else
 					{
-						Tiles[i]->SetTileRight(Tiles[i - 8]);
+						if (i - 1 >= 0 && i - 1 <= 63)
+						{
+							if (Tiles[i - 1])
+							{
+								if (i % 8 == 0)
+								{
+									UE_LOG(LogTemp, Warning, TEXT("TileUp SetNullptr"))
+										Tiles[i]->SetTileUp(nullptr);
+								}
+								else
+								{
+									Tiles[i]->SetTileUp(Tiles[i - 1]);
+								}
+							}
+						}
+
+						if (i + 7 >= 0 && i + 7 <= 63)
+						{
+							if (Tiles[i + 7])
+							{
+								Tiles[i]->SetTileDiagonalLeftUp(Tiles[i + 7]);
+							}
+						}
+						if (i - 9 >= 0 && i - 9 <= 63)
+						{
+							if (Tiles[i - 9])
+							{
+								Tiles[i]->SetTileDiagonalRightUp(Tiles[i - 9]);
+							}
+						}
 					}
-				}
-				if (i + 9 >= 0 && i + 9 <= 63)
-				{
-					if (Tiles[i + 9])
+
+					if (i + 8 >= 0 && i + 8 <= 63)
 					{
-						Tiles[i]->SetTileDiagonalLeftDown(Tiles[i + 9]);
+						if (Tiles[i + 8])
+						{
+							Tiles[i]->SetTileLeft(Tiles[i + 8]);
+						}
 					}
-				}
-				if (i - 9 >= 0 && i - 9 <= 63)
-				{
-					if (Tiles[i - 9])
+					if (i - 8 >= 0 && i - 8 <= 63)
 					{
-						Tiles[i]->SetTileDiagonalRightDown(Tiles[i - 9]);
-					}
-				}
-				if (i + 7 >= 0 && i + 7 <= 63)
-				{
-					if (Tiles[i + 7])
-					{
-						Tiles[i]->SetTileDiagonalLeftUp(Tiles[i + 7]);
-					}
-				}
-				if (i - 7 >= 0 && i - 7 <= 63)
-				{
-					if (Tiles[i - 7])
-					{
-						Tiles[i]->SetTileDiagonalRightUp(Tiles[i - 7]);
+						if (Tiles[i - 8])
+						{
+							Tiles[i]->SetTileRight(Tiles[i - 8]);
+						}
 					}
 				}
 			}
@@ -339,117 +380,7 @@ ATile* ABoard::GetTileUnderCursor(FVector CursorLocation)
 
 void ABoard::UpdateTilesForTile(ATile* TileToUpdate)
 {
-	if (Tiles.Num())
-	{
-		for (int i = 0; i <= 63; ++i)
-		{
-			if (Tiles[i] == TileToUpdate)
-			{
-				if (i + 1 >= 0 && i + 1<= 63)
-				{
-					if (Tiles[i + 1])
-					{
-						if (TileToUpdate->GetTileDown())
-						{
-							TileToUpdate->GetTileDown()->SetDefaultMaterial();
-						}
-						if ((i % 7 == 0 || i % 8 == 0) && i != 0)
-						{
-							TileToUpdate->SetTileDown(nullptr);
-						}
-						else
-						{
-							TileToUpdate->SetTileDown(Tiles[i + 1]);
-						}
-					}
-				}
-				if (i - 1 >= 0 && i - 1 <= 63)
-				{
-					if (Tiles[i - 1])
-					{
-						if (TileToUpdate->GetTileUp())
-						{
-							TileToUpdate->GetTileUp()->SetDefaultMaterial();
-						}
-						if ((i % 7 == 0 || i % 8 == 0) && i != 0)
-						{
-							TileToUpdate->SetTileUp(nullptr);
-						}
-						else
-						{
-							TileToUpdate->SetTileUp(Tiles[i - 1]);
-						}
-					}
-				}
-				if (i + 8 >= 0 && i + 8 <= 63)
-				{
-					if (Tiles[i + 8])
-					{
-						if (TileToUpdate->GetTileLeft())
-						{
-							TileToUpdate->GetTileLeft()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileLeft(Tiles[i + 8]);
-					}
-				}
-				if (i - 8 >= 0 && i - 8 <= 63)
-				{
-					if (Tiles[i - 8])
-					{
-						if (TileToUpdate->GetTileRight())
-						{
-							TileToUpdate->GetTileRight()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileRight(Tiles[i - 8]);
-					}
-				}
-				if (i + 9 >= 0 && i + 9 <= 63)
-				{
-					if (Tiles[i + 9])
-					{
-						if (TileToUpdate->GetTileDiagonalLeftDown())
-						{
-							TileToUpdate->GetTileDiagonalLeftDown()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileDiagonalLeftDown(Tiles[i + 9]);
-					}
-				}
-				if (i - 9 >= 0 && i - 9 <= 63)
-				{
-					if (Tiles[i - 9])
-					{
-						if (TileToUpdate->GetTileDiagonalRightDown())
-						{
-							TileToUpdate->GetTileDiagonalRightDown()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileDiagonalRightDown(Tiles[i - 9]);
-					}
-				}
-				if (i + 7 >= 0 && i + 7 <= 63)
-				{
-					if (Tiles[i + 7])
-					{
-						if (TileToUpdate->GetTileDiagonalLeftUp())
-						{
-							TileToUpdate->GetTileDiagonalLeftUp()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileDiagonalLeftUp(Tiles[i + 7]);
-					}
-				}
-				if (i - 7 >= 0 && i - 7 <= 63)
-				{
-					if (Tiles[i - 7])
-					{
-						if (TileToUpdate->GetTileDiagonalRightUp())
-						{
-							TileToUpdate->GetTileDiagonalRightUp()->SetDefaultMaterial();
-						}
-						TileToUpdate->SetTileDiagonalRightUp(Tiles[i - 7]);
-					}
-				}
-			}
-		}
-	}
+
 }
 
 TArray<ATile*>& ABoard::GetAllTilesUp(ATile* StartingTile)
@@ -1759,7 +1690,10 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile* StartingTile)
 				}
 			}
 		}
-
+		else
+		{
+			return TilesToReturn;
+		}
 		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
 		{
 			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
