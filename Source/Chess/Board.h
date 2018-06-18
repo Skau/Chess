@@ -27,6 +27,8 @@ public:
 	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
 
+	void SpawnChessPieces();
+
 private:
 	// Sets default values for this actor's properties
 	ABoard();
@@ -37,16 +39,10 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnTilesAndChessPieces();
+	void SpawnTiles();
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh = nullptr;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WhitePawnsTakenMesh = nullptr;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BlackPawnsTakenMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> TileActor;

@@ -8,7 +8,8 @@
 
 class ATile;
 
-enum class EPieceType 
+UENUM(BlueprintType)
+enum class EPieceType : uint8
 {
 	Pawn,
 	Rook,
@@ -49,6 +50,7 @@ public:
 	
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EPieceType GetPieceType() { return Type; }
 
 protected:
@@ -60,6 +62,9 @@ protected:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* SceneComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh = nullptr;

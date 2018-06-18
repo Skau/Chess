@@ -14,6 +14,13 @@ class CHESS_API ACustomPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AChessPiece* GetCurrentChessPieceClicked() { return CurrentChessPieceClicked; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	AChessPiece* GetCurrentChessPieceHovered() { return CurrentChessPieceHovered; }
+
 private:
 	ACustomPlayerController();
 

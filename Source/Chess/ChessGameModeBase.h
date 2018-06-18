@@ -20,16 +20,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIsWhiteTurn() { return bIsWhiteTurn; }
 
+	void SetGameIsOver(bool DidWhiteWin) { bGameIsOver = true; bWhiteWon = DidWhiteWin; }
+
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
-
-	void SetGameIsOver(bool DidWhiteWin) { bGameIsOver = true; bWhiteWon = DidWhiteWin; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIfGameIsOver() { return bGameIsOver; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetWhiteWon() { return bWhiteWon; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetGameIsActive() { return bGameIsActive; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetGameIsActive(bool Value) { bGameIsActive = Value; }
 
 	void ToggleTurn();
 
@@ -82,6 +88,8 @@ private:
 	bool bGameIsOver = false;
 
 	bool bWhiteWon = false;
+
+	bool bGameIsActive = false;
 
 	int BlackPawnsLost = 0;
 	int BlackRooksLost = 0;

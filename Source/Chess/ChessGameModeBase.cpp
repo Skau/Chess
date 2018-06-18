@@ -15,6 +15,10 @@ void AChessGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FActorSpawnParameters SpawnParameters;
+
+	GameBoard = GetWorld()->SpawnActor<ABoard>(Board, SpawnParameters);
+
 	BlackPawnsLost = 0;
 	BlackRooksLost = 0;
 	BlackKnightsLost = 0;
@@ -34,13 +38,8 @@ void AChessGameModeBase::Tick(float DeltaTime)
 
 void AChessGameModeBase::StartGame()
 {
-	FActorSpawnParameters SpawnParameters;
-
-	GameBoard = GetWorld()->SpawnActor<ABoard>(Board, SpawnParameters);
-	if (GameBoard)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameBoard set!"))
-	}
+	GameBoard->SpawnChessPieces();
+	bGameIsActive = true;
 }
 
 void AChessGameModeBase::ToggleTurn()
