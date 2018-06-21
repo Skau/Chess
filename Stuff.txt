@@ -1,0 +1,32 @@
+- Generell rydding
+
+- Flytt all tilelogikk fra PC til Tile/Board
+
+- Lag en generell GM, og to nye gm'er
+  Èn for mot spiller og èn for mot AI
+
+- Fikse system for å se pieces som er tatt
+
+- Fikse historikk på movement av pieces
+  Mulig navngiving av tiles må til.
+
+- AI:
+  Sjekk om noen egne kan bli tatt (weighted)
+  ^Prioriter hvilke brikke som vil bli redda hvis fler
+	if: Sjekk om du kan ta den brikka som
+	vil ta din egen
+		if: Ta den
+		else: Flytt din egen brikke safely.
+	else: Sjekk om du kan ta noen
+		if: Ta den (weighted)
+                            ^Hvis brikka kan bli tatt uten at den blir selv tatt neste runde, ikke bruk bonde
+                            ^^Prioriter også hvem man skal ta hvis fler
+		else: Flytt en random brikke slik atden ikke kan bli tatt neste runde.
+
+ *Weightsystem, så dronning vil bli prioritert før    bonde feks.
+
+ * Minimax, Negamax, Alpha-beta pruning, Iterative deepening + Hash table
+
+Delay AI decision et par sek for å gi spilleren litt tid.
+
+Farge tiles rød/grønne for å vise siste move gjort. 

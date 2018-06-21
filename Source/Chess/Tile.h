@@ -87,6 +87,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	int index = 0;
 
+	UPROPERTY(VisibleAnywhere)
+	FName TileName = "";
+
 private:
 	// Sets default values for this actor's properties
 	ATile();
@@ -115,8 +118,6 @@ private:
 
 	bool bIsLightMaterial = false;
 	bool bIsDarkMaterial = false;
-
-	FName TileName;
 
 	AChessPiece* CurrentChessPiece = nullptr;
 

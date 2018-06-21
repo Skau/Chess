@@ -20,8 +20,11 @@ ABoard::ABoard()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+	RootComponent = SceneComponent;
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	RootComponent = Mesh;
+	Mesh->SetupAttachment(RootComponent);
 
 	Tiles.Reserve(64);
 }
@@ -43,6 +46,9 @@ void ABoard::Tick(float DeltaTime)
 
 void ABoard::SpawnTiles()
 {
+	FString Letter = "h";
+	int Number = 1;
+
 	bool bUseLightMaterial = true;
 
 	FVector SpawnLocation = FVector(43.75, 43.75, 100);
@@ -93,6 +99,41 @@ void ABoard::SpawnTiles()
 			Tile->SetName(FName(*(FString("Tile") + FString::FromInt(i))));
 			Tile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			Tile->index = i;
+			FString Name = Letter + FString::FromInt(Number);
+			Tile->SetName(FName(*Name));
+			if (Letter == "h")
+			{
+				Letter = "g";
+			}
+			else if (Letter == "g")
+			{
+				Letter = "f";
+			}
+			else if (Letter == "f")
+			{
+				Letter = "e";
+			}
+			else if (Letter == "e")
+			{
+				Letter = "d";
+			}
+			else if (Letter == "d")
+			{
+				Letter = "c";
+			}
+			else if (Letter == "c")
+			{
+				Letter = "b";
+			}
+			else if (Letter == "b")
+			{
+				Letter = "a";
+			}
+			else if (Letter == "a")
+			{
+				Letter = "h";
+				Number++;
+			}
 			Tiles.Add(Tile);
 		}
 

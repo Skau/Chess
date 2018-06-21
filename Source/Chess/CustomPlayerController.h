@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	AChessPiece* GetCurrentChessPieceHovered() { return CurrentChessPieceHovered; }
 
+	UFUNCTION(BlueprintCallable)
+	void SetMenuWindowOpenBool(bool Value) { bMenuWindowIsOpen = Value; }
+
 private:
 	ACustomPlayerController();
 
@@ -33,6 +36,8 @@ private:
 	void OnHover();
 
 	void OnLeftClick();
+
+	void RestartGame();
 
 	void ResetHoveringChessPiece();
 
@@ -61,5 +66,7 @@ private:
 	TArray<ATile*> CurrentPossibleMoveLocationTiles;
 
 	bool bPieceIsCapturing = false;
+
+	bool bMenuWindowIsOpen = true;
 	
 };

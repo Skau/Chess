@@ -23,7 +23,7 @@ public:
 	void SetGameIsOver(bool DidWhiteWin) { bGameIsOver = true; bWhiteWon = DidWhiteWin; }
 
 	UFUNCTION(BlueprintCallable)
-	void StartGame();
+	void StartGame(bool IsPlayingAgainstPlayer);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIfGameIsOver() { return bGameIsOver; }
@@ -71,7 +71,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetWhiteQueenLost() { return WhiteQueenLost; }
 
-private:
+	UFUNCTION(BlueprintCallable)
+	void SetIfPlayingAgainstPlayer(bool Value) { bAgainstPlayer = Value; }
+
+	bool GetIfPlayingAgainstPlayer() { return bAgainstPlayer; }
+
+protected:
 	AChessGameModeBase();
 
 	virtual	void BeginPlay() override;
@@ -90,6 +95,8 @@ private:
 	bool bWhiteWon = false;
 
 	bool bGameIsActive = false;
+
+	bool bAgainstPlayer = false;
 
 	int BlackPawnsLost = 0;
 	int BlackRooksLost = 0;

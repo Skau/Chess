@@ -17,10 +17,10 @@ ACustomPlayerController::ACustomPlayerController()
 
 void ACustomPlayerController::BeginPlay()
 {
-Super::BeginPlay();
+	Super::BeginPlay();
 
-GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-GameBoard = GameMode->GetGameBoard();
+	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameBoard = GameMode->GetGameBoard();
 }
 
 void ACustomPlayerController::Tick(float DeltaTime)
@@ -38,9 +38,19 @@ void ACustomPlayerController::SetupInputComponent()
 
 	if (InputComponent)
 	{
-		InputComponent->BindAction("ToggleSelectObject", IE_Pressed, this, &ACustomPlayerController::OnLeftClick);
+		InputComponent->BindAction("ToggleSelectObject", IE_Pressed, this, &ACustomPlayerController::OnLeftClick); 
+		InputComponent->BindAction("ResetGame", IE_Repeat, this, &ACustomPlayerController::RestartGame);
 	}
 
+}
+
+void ACustomPlayerController::RestartGame()
+{
+	if (!bMenuWindowIsOpen)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), FName(*UGameplayStatics::GetCurrentLevelName(GetWorld(), true)));
+		bMenuWindowIsOpen = true;
+	}
 }
 
 void ACustomPlayerController::OnHover()
@@ -50,11 +60,29 @@ void ACustomPlayerController::OnHover()
 		// If hovering a chess piece
 		if (CursorHitResult.Actor->IsA(AChessPiece::StaticClass()))
 		{
-			// In case a chess piece or tile was already hovered
-			ResetHoveringChessPiece();
-			ResetHoveringTile();
+			auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
+			if (Piece)
+			{
+				if (GameMode->GetIfPlayingAgainstPlayer())
+				{
+					// In case a chess piece or tile was already hovered
+					ResetHoveringChessPiece();
+					ResetHoveringTile();
 
-			UpdateHoveringChessPiece();
+					UpdateHoveringChessPiece();
+				}
+				else
+				{
+					if (Piece->GetIsWhite() && GameMode->GetIsWhiteTurn())
+					{
+						// In case a chess piece or tile was already hovered
+						ResetHoveringChessPiece();
+						ResetHoveringTile();
+
+						UpdateHoveringChessPiece();
+					}
+				}
+			}
 		}
 		// If hovering a tile
 		else if (CursorHitResult.Actor->IsA(ATile::StaticClass()))
@@ -83,13 +111,14 @@ void ACustomPlayerController::OnLeftClick()
 		// If hovering over piece
 		if (CurrentChessPieceHovered)
 		{
+			// If already clicked a piece
 			if (CurrentChessPieceClicked)
 			{
 				if (!bPieceIsCapturing)
 				{
 					auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
 					if (Piece)
-					{
+					{ 
 						if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
 						{
 							CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), true);
@@ -102,21 +131,45 @@ void ACustomPlayerController::OnLeftClick()
 			}
 
 			// Set new piece
-			if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
+
+			if (GameMode->GetIfPlayingAgainstPlayer())
 			{
-				// Resets tiles and deselects piece in case one is already pressed
-				ResetSelectedChessPieceTiles();
-
-				CurrentChessPieceClicked = CurrentChessPieceHovered;
-
-				// Set new blue tiles
-				UpdateSelectedChessPieceTiles();
-
-				if (bPieceIsCapturing)
+				if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
 				{
+					// Resets tiles and deselects piece in case one is already pressed
 					ResetSelectedChessPieceTiles();
 
+					CurrentChessPieceClicked = CurrentChessPieceHovered;
+
+					// Set new blue tiles
 					UpdateSelectedChessPieceTiles();
+
+					if (bPieceIsCapturing)
+					{
+						ResetSelectedChessPieceTiles();
+
+						UpdateSelectedChessPieceTiles();
+					}
+				}
+			}
+			else
+			{
+				if (GameMode->GetIsWhiteTurn() && CurrentChessPieceHovered->GetIsWhite())
+				{
+					// Resets tiles and deselects piece in case one is already pressed
+					ResetSelectedChessPieceTiles();
+
+					CurrentChessPieceClicked = CurrentChessPieceHovered;
+
+					// Set new blue tiles
+					UpdateSelectedChessPieceTiles();
+
+					if (bPieceIsCapturing)
+					{
+						ResetSelectedChessPieceTiles();
+
+						UpdateSelectedChessPieceTiles();
+					}
 				}
 			}
 		}
@@ -160,8 +213,8 @@ void ACustomPlayerController::ResetHoveringChessPiece()
 		if (CurrentChessPieceHovered != CurrentChessPieceClicked)
 		{
 			CurrentChessPieceHovered->SetDefaultMaterial();
-			CurrentChessPieceHovered = nullptr;
 		}
+		CurrentChessPieceHovered = nullptr;
 	}
 }
 

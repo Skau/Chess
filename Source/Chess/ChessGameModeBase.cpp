@@ -36,20 +36,37 @@ void AChessGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AChessGameModeBase::StartGame()
+void AChessGameModeBase::StartGame(bool IsPlayingAgainstPlayer)
 {
 	GameBoard->SpawnChessPieces();
 	bGameIsActive = true;
+	bAgainstPlayer = IsPlayingAgainstPlayer;
 }
 
 void AChessGameModeBase::ToggleTurn()
 {
-	if (bIsWhiteTurn)
+	if (bAgainstPlayer)
 	{
-		bIsWhiteTurn = false;
+		if (bIsWhiteTurn)
+		{
+			bIsWhiteTurn = false;
+		}
+		else
+		{
+			bIsWhiteTurn = true;
+		}
 	}
 	else
 	{
-		bIsWhiteTurn = true;
+		if (bIsWhiteTurn)
+		{
+			bIsWhiteTurn = false;
+			// AI
+		}
+		else
+		{
+			bIsWhiteTurn = true;
+		}
 	}
+
 }

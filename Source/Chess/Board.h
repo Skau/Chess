@@ -42,6 +42,9 @@ private:
 	void SpawnTiles();
 
 	UPROPERTY(VisibleAnywhere)
+	USceneComponent* SceneComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
