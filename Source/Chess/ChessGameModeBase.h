@@ -70,11 +70,13 @@ public:
 	int GetWhiteBishopsLost() { return WhiteBishopsLost; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetWhiteQueenLost() { return WhiteQueenLost; }
-
 	UFUNCTION(BlueprintCallable)
 	void SetIfPlayingAgainstPlayer(bool Value) { bAgainstPlayer = Value; }
 
 	bool GetIfPlayingAgainstPlayer() { return bAgainstPlayer; }
+
+	class AChessAI* GetChessAI() { return ChessAI; }
+
 
 protected:
 	AChessGameModeBase();
@@ -87,7 +89,10 @@ protected:
 	TSubclassOf<AActor> Board = nullptr;
 
 	class ABoard* GameBoard = nullptr;
-	
+
+	UPROPERTY()
+	class AChessAI* ChessAI = nullptr;
+
 	bool bIsWhiteTurn = true;
 
 	bool bGameIsOver = false;
@@ -108,4 +113,6 @@ protected:
 	int WhiteKnightsLost = 0;
 	int WhiteBishopsLost = 0;
 	int WhiteQueenLost = 0;
+
+
 };

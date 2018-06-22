@@ -16,8 +16,6 @@ class CHESS_API ABoard : public AActor
 public:
 	TArray<ATile*>& GetAllTiles() { return Tiles; }
 
-	void CapturePiece(class AChessPiece* PieceCaptured);
-
 	TArray<ATile*>& GetAllTilesUp(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesDown(ATile* StartingTile);
 	TArray<ATile*>& GetAllTilesLeft(ATile* StartingTile);
@@ -28,6 +26,12 @@ public:
 	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
 
 	void SpawnChessPieces();
+
+	TArray<class AChessPiece*>& GetAllWhitePieces() { return AllWhitePieces; }
+
+	TArray<class AChessPiece*>& GetAllBlackPieces() { return AllBlackPieces; }
+
+	void UpdateChessPiecesLeft(class AChessPiece* ChessPieceToRemove, bool IfWhite);
 
 private:
 	// Sets default values for this actor's properties
@@ -40,6 +44,10 @@ private:
 	virtual void Tick(float DeltaTime) override;
 
 	void SpawnTiles();
+
+	class AChessGameModeBase* GameMode = nullptr;
+
+	class AChessAI* ChessAI = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* SceneComponent = nullptr;
@@ -67,6 +75,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AChessPiece> RookPiece;
+
+	TArray<AChessPiece*> AllBlackPieces;
+
+	TArray<AChessPiece*> AllWhitePieces;
 
 	TArray<ATile*> Tiles;
 

@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ChessGameModeBase.h"
 #include "Board.h"
+#include "ChessPiece.h"
 
 // Sets default values
 ATile::ATile()
@@ -86,6 +87,16 @@ void ATile::SetDefaultMaterial()
 	{
 		SetDarkMaterial();
 	}
+
+	if (bIsPossibleCaptureLocation)
+	{
+		bIsPossibleCaptureLocation = false;
+	}
+
+	if (bIsPossibleMoveLocation)
+	{
+		bIsPossibleMoveLocation = false;
+	}
 }
 
 void ATile::SetAllTilesAroundBlue()
@@ -145,56 +156,62 @@ TArray<ATile*>& ATile::GetAllTilesInADirection(ATile * StartTile, EDirection Dir
 	case EDirection::UP:
 		for (auto& TileToAdd : GameBoard->GetAllTilesUp(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::DOWN:
 		for (auto& TileToAdd : GameBoard->GetAllTilesDown(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::LEFT:
 		for (auto& TileToAdd : GameBoard->GetAllTilesLeft(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::RIGHT:
 		for (auto& TileToAdd : GameBoard->GetAllTilesRight(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::DIARIGHTUP:
 		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightUp(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::DIARIGHTDOWN:
 		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightDown(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::DIALEFTUP:
 		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftUp(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	case EDirection::DIALEFTDOWN:
 		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftDown(StartTile))
 		{
+			TileToAdd->SetIsPossibleMoveLocation(true);
 			AllTilesInADirection.Add(TileToAdd);
 		}
 		break;
 	default:
 		break;
 	}
-	
-
 	return AllTilesInADirection;
 }
 

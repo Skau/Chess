@@ -4,8 +4,9 @@
 #include "Engine/World.h"
 #include "Kismet/Gameplaystatics.h"
 #include "Components/StaticMeshComponent.h"
-#include "Tile.h"
 #include "ChessGameModeBase.h"
+#include "Tile.h"
+#include "ChessAI.h"
 #include "ChessPiece.h"
 #include "PawnPiece.h"
 #include "KnightPiece.h"
@@ -27,6 +28,11 @@ ABoard::ABoard()
 	Mesh->SetupAttachment(RootComponent);
 
 	Tiles.Reserve(64);
+	AllWhitePieces.Reserve(16);
+	AllBlackPieces.Reserve(16);
+
+	AllBlackPieces.Reserve(16);
+	AllWhitePieces.Reserve(16);
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +41,18 @@ void ABoard::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnTiles();
+
+	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		ChessAI = GameMode->GetChessAI();
+		if (ChessAI)
+		{
+		}
+	}
+	else
+	{
+	}
 }
 
 // Called every frame
@@ -255,6 +273,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Rook);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 
 			if (i == 1 || i == 6)
@@ -266,6 +285,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Knight);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 
 			if (i == 2 || i == 5)
@@ -277,6 +297,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Bishop);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 
 			if (i == 3)
@@ -288,6 +309,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Queen);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 
 			if (i == 4)
@@ -299,6 +321,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::King);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 
 			if (PawnPiece && i <= 15 && i >= 8)
@@ -310,6 +333,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Pawn);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllWhitePieces.Add(piece);
 			}
 		}
 		else if (i > 47)
@@ -323,6 +347,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Rook);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 
 			if (i == 62 || i == 57)
@@ -334,6 +359,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Knight);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 
 			if (i == 61 || i == 58)
@@ -345,6 +371,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Bishop);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 
 			if (i == 60)
@@ -356,6 +383,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::King);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 
 			if (i == 59)
@@ -367,6 +395,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Queen);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 
 			if (PawnPiece && i <= 55 && i >= 48)
@@ -378,99 +407,23 @@ void ABoard::SpawnChessPieces()
 				piece->SetPieceType(EPieceType::Pawn);
 				piece->SetCurrentTile(Tiles[i]);
 				Tiles[i]->SetChessPice(piece);
+				AllBlackPieces.Add(piece);
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("AllFriendlyPieces: %i"), AllWhitePieces.Num())
+	UE_LOG(LogTemp, Warning, TEXT("AllEnemyPieces: %i"), AllBlackPieces.Num())
 }
 
-void ABoard::CapturePiece(AChessPiece * PieceCaptured)
+void ABoard::UpdateChessPiecesLeft(AChessPiece* ChessPieceToRemove, bool IfWhite)
 {
-	if (PieceCaptured)
+	if (IfWhite)
 	{
-		//auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-		//if (GameMode)
-		//{
-		//	auto Type = PieceCaptured->GetPieceType();
-		//	switch (Type)
-		//	{
-		//	case EPieceType::Pawn:
-		//	{
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->IncrementWhitePawnsLost();
-		//		}
-		//		else
-		//		{
-		//			GameMode->IncrementBlackPawnsLost();
-		//		}
-		//		break;
-		//	}
-		//	case EPieceType::Rook:
-		//	{
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->IncrementWhiteRooksLost();
-		//		}
-		//		else
-		//		{
-		//			GameMode->IncrementBlackRooksLost();
-		//		}
-		//		break;
-		//	}
-		//	case EPieceType::Knight:
-		//	{
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->IncrementWhiteKnightsLost();
-		//		}
-		//		else
-		//		{
-		//			GameMode->IncrementBlackKnightsLost();
-		//		}
-		//		break;
-		//	}
-		//	case EPieceType::Bishop:
-		//	{
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->IncrementWhiteBishopsLost();
-		//		}
-		//		else
-		//		{
-		//			GameMode->IncrementBlackBishopsLost();
-		//		}
-		//		break;
-		//	}
-		//	case EPieceType::King:
-		//	{
-		//		auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->SetGameIsOver(true);
-		//		}
-		//		else
-		//		{
-		//			GameMode->SetGameIsOver(false);
-		//		}
-		//		break;
-		//	}
-		//	case EPieceType::Queen:
-		//	{
-		//		if (PieceCaptured->GetIsWhite())
-		//		{
-		//			GameMode->SetWhiteQueenLost();
-		//		}
-		//		else
-		//		{
-		//			GameMode->SetBlackQueenLost();
-		//		}
-		//		break;
-		//	}
-		//	default:
-		//		break;
-		//	}
-		//}
-		PieceCaptured->Destroy();
+		AllWhitePieces.Remove(ChessPieceToRemove);
+	}
+	else
+	{
+		AllBlackPieces.Remove(ChessPieceToRemove);
 	}
 }
 

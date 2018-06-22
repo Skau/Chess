@@ -40,19 +40,20 @@ public:
 
 	FName GetCurrentTileName();
 
-	ATile* GetCurrentTile() { return CurrentTile; }
+	ATile*& GetCurrentTile() { return CurrentTile; }
 
 	void SetCurrentTile(ATile* NewTile) { CurrentTile = NewTile; }
 
 	virtual TArray<ATile*>& GetAllPossibleTiles();
 
-	void MoveToNewTile(ATile * NewTile, bool WillCapturePiece = false);
+	void MoveToNewTile(ATile*& NewTile);
 	
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EPieceType GetPieceType() { return Type; }
 
+	virtual ~AChessPiece() = default;
 protected:
 	// Sets default values for this actor's properties
 	AChessPiece();
@@ -80,6 +81,9 @@ protected:
 
 	bool bIsWhite = false;
 
+	class AChessAI* ChessAI = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
 	ATile* CurrentTile = nullptr;
 
 	TArray<ATile*> AllPossibleTiles;

@@ -73,7 +73,7 @@ void ACustomPlayerController::OnHover()
 				}
 				else
 				{
-					if (Piece->GetIsWhite() && GameMode->GetIsWhiteTurn())
+					if (Piece->GetIsWhite() && GameMode->GetIsWhiteTurn() || Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
 					{
 						// In case a chess piece or tile was already hovered
 						ResetHoveringChessPiece();
@@ -112,7 +112,7 @@ void ACustomPlayerController::OnLeftClick()
 		if (CurrentChessPieceHovered)
 		{
 			// If already clicked a piece
-			if (CurrentChessPieceClicked)
+			if (CurrentChessPieceClicked != CursorHitResult.Actor)
 			{
 				if (!bPieceIsCapturing)
 				{
@@ -121,7 +121,7 @@ void ACustomPlayerController::OnLeftClick()
 					{ 
 						if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
 						{
-							CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), true);
+							CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile());
 							ResetSelectedChessPieceTiles(Piece);
 							bPieceIsCapturing = true;
 							GameMode->ToggleTurn();
@@ -131,7 +131,6 @@ void ACustomPlayerController::OnLeftClick()
 			}
 
 			// Set new piece
-
 			if (GameMode->GetIfPlayingAgainstPlayer())
 			{
 				if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
@@ -188,7 +187,7 @@ void ACustomPlayerController::OnLeftClick()
 					{
 						if (CurrentHoveredTile->GetIsPossibleCaptureLocation())
 						{
-							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile, true);
+							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
 							GameMode->ToggleTurn();
 						}
 						else if (CurrentHoveredTile->GetIsPossibleMoveLocation())
@@ -280,11 +279,11 @@ void ACustomPlayerController::ResetSelectedChessPieceTiles(AChessPiece* ChessPie
 		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())
 		{
 			Tile->SetDefaultMaterial();
-			Tile->SetIsPossibleMoveLocation(false);
-			if (Tile->GetIsPossibleCaptureLocation())
-			{
-				Tile->SetIsPossibleCaptureLocation(false);
-			}
+			//Tile->SetIsPossibleMoveLocation(false);
+			//if (Tile->GetIsPossibleCaptureLocation())
+			//{
+			//	Tile->SetIsPossibleCaptureLocation(false);
+			//}
 		}
 	}
 
@@ -293,11 +292,11 @@ void ACustomPlayerController::ResetSelectedChessPieceTiles(AChessPiece* ChessPie
 		for (auto& Tile : CurrentPossibleMoveLocationTiles)
 		{
 			Tile->SetDefaultMaterial();
-			if (Tile->GetIsPossibleCaptureLocation())
-			{
-				Tile->SetIsPossibleCaptureLocation(false);
-			}
-			Tile->SetIsPossibleMoveLocation(false);
+		//	if (Tile->GetIsPossibleCaptureLocation())
+		//	{
+		//		Tile->SetIsPossibleCaptureLocation(false);
+		//	}
+		//	Tile->SetIsPossibleMoveLocation(false);
 		}
 		CurrentPossibleMoveLocationTiles.Empty();
 	}
@@ -326,7 +325,6 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 			{
 				Tile->SetPossibleMoveMaterial();
 			}
-
 			Tile->SetIsPossibleMoveLocation(true);
 			CurrentPossibleMoveLocationTiles.Add(Tile);
 		}

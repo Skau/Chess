@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "ChessGameModeBase.h"
+#include "ChessAI.h"
 #include "Board.h"
 #include "Board.h"
 #include "Tile.h"
@@ -28,6 +29,17 @@ AChessPiece::AChessPiece()
 void AChessPiece::BeginPlay()
 {
 	Super::BeginPlay();
+	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		ChessAI = GameMode->GetChessAI();
+		if (ChessAI)
+		{
+		}
+	}
+	else
+	{
+	}
 }
 
 // Called every frame
@@ -43,26 +55,40 @@ TArray<ATile*>& AChessPiece::GetAllPossibleTiles()
 	return AllPossibleTiles;
 }
 
-void AChessPiece::MoveToNewTile(ATile * NewTile, bool WillCapturePiece)
+void AChessPiece::MoveToNewTile(ATile*& NewTile)
 {
-	if (!NewTile || !CurrentTile) { return; }
+	if (!NewTile || !CurrentTile) { UE_LOG(LogTemp, Warning, TEXT("NewTile or CurrentTile == nullptr")) return; }
 
 	if (NewTile->GetIsPossibleMoveLocation())
 	{
-		if (WillCapturePiece && NewTile->GetHasChessPiece())
+		UE_LOG(LogTemp, Warning, TEXT("Is possible move location"))
+		if (NewTile->GetIsPossibleCaptureLocation())
 		{
-			GameBoard->CapturePiece(NewTile->GetChessPiece());
+			if (GameMode)
+			{
+				GameMode->GetGameBoard()->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
+			}
+			NewTile->GetChessPiece()->Destroy();
+			//GameBoard->CapturePiece(NewTile->GetChessPiece());
 		}
-
+		UE_LOG(LogTemp, Warning, TEXT("CurrentTile->SetChessPice(nullptr);"))
 		CurrentTile->SetChessPice(nullptr);
+		UE_LOG(LogTemp, Warning, TEXT("CurrentTile = NewTile;"))
 		CurrentTile = NewTile;
+		UE_LOG(LogTemp, Warning, TEXT("SetActorLocation"))
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20).ToString())
 
 		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
+		UE_LOG(LogTemp, Warning, TEXT("CurrentTile->SetChessPice(this);"))
 		CurrentTile->SetChessPice(this);
 		if (bIsFirstMove)
 		{
 			bIsFirstMove = false;
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Is not possible move location!"))
 	}
 }
 

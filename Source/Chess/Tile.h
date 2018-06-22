@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+class AChessPiece;
+
 enum class EDirection 
 {
 	UP,
@@ -48,9 +50,9 @@ public:
 
 	bool GetHasChessPiece() { return CurrentChessPiece ? true : false; }
 
-	void SetChessPice(class AChessPiece* NewChessPiece) { CurrentChessPiece = NewChessPiece; }
+	void SetChessPice(AChessPiece* NewChessPiece) { CurrentChessPiece = NewChessPiece; }
 
-	class AChessPiece* GetChessPiece() { return CurrentChessPiece; }
+	AChessPiece*& GetChessPiece() { return CurrentChessPiece; }
 
 	void SetIsPossibleMoveLocation(bool Value) { bIsPossibleMoveLocation = Value; }
 
@@ -75,14 +77,14 @@ public:
 	void SetTileDiagonalRightDown(ATile* TileIn) { TileDiagonalRightDown = TileIn; }
 	void SetTileDiagonalLeftDown(ATile* TileIn) { TileDiagonalLeftDown = TileIn; }
 
-	ATile* GetTileUp() { return TileUp; }
-	ATile* GetTileDown() { return TileDown; }
-	ATile* GetTileLeft() { return TileLeft; }
-	ATile* GetTileRight() { return TileRight; }
-	ATile* GetTileDiagonalRightUp() { return TileDiagonalRightUp; }
-	ATile* GetTileDiagonalLeftUp() { return TileDiagonalLeftUp; }
-	ATile* GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
-	ATile* GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
+	ATile*& GetTileUp() { return TileUp; }
+	ATile*& GetTileDown() { return TileDown; }
+	ATile*& GetTileLeft() { return TileLeft; }
+	ATile*& GetTileRight() { return TileRight; }
+	ATile*& GetTileDiagonalRightUp() { return TileDiagonalRightUp; }
+	ATile*& GetTileDiagonalLeftUp() { return TileDiagonalLeftUp; }
+	ATile*& GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
+	ATile*& GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
 
 	UPROPERTY(VisibleAnywhere)
 	int index = 0;

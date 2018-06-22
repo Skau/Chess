@@ -3,6 +3,8 @@
 #include "ChessGameModeBase.h"
 #include "Engine/World.h"
 #include "Board.h"
+#include "ChessAI.h"
+#include "ChessPiece.h"
 
 
 AChessGameModeBase::AChessGameModeBase()
@@ -29,6 +31,9 @@ void AChessGameModeBase::BeginPlay()
 	WhiteKnightsLost = 0;
 	WhiteBishopsLost = 0;
 	WhiteQueenLost = 0;
+
+	FActorSpawnParameters ActorSpawnParameters;
+	ChessAI = GetWorld()->SpawnActor<AChessAI>(ActorSpawnParameters);
 }
 
 void AChessGameModeBase::Tick(float DeltaTime)
@@ -41,6 +46,11 @@ void AChessGameModeBase::StartGame(bool IsPlayingAgainstPlayer)
 	GameBoard->SpawnChessPieces();
 	bGameIsActive = true;
 	bAgainstPlayer = IsPlayingAgainstPlayer;
+
+	//if (!bAgainstPlayer)
+	//{
+
+	//}
 }
 
 void AChessGameModeBase::ToggleTurn()
@@ -62,6 +72,7 @@ void AChessGameModeBase::ToggleTurn()
 		{
 			bIsWhiteTurn = false;
 			// AI
+			ChessAI->StartRound(GameBoard);
 		}
 		else
 		{
@@ -70,3 +81,4 @@ void AChessGameModeBase::ToggleTurn()
 	}
 
 }
+
