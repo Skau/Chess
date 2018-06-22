@@ -55,30 +55,32 @@ void AChessGameModeBase::StartGame(bool IsPlayingAgainstPlayer)
 
 void AChessGameModeBase::ToggleTurn()
 {
-	if (bAgainstPlayer)
+	if (!bGameIsOver)
 	{
-		if (bIsWhiteTurn)
+		if (bAgainstPlayer)
 		{
-			bIsWhiteTurn = false;
+			if (bIsWhiteTurn)
+			{
+				bIsWhiteTurn = false;
+			}
+			else
+			{
+				bIsWhiteTurn = true;
+			}
 		}
 		else
 		{
-			bIsWhiteTurn = true;
+			if (bIsWhiteTurn)
+			{
+				bIsWhiteTurn = false;
+				// AI
+				ChessAI->StartRound(GameBoard);
+			}
+			else
+			{
+				bIsWhiteTurn = true;
+			}
 		}
 	}
-	else
-	{
-		if (bIsWhiteTurn)
-		{
-			bIsWhiteTurn = false;
-			// AI
-			ChessAI->StartRound(GameBoard);
-		}
-		else
-		{
-			bIsWhiteTurn = true;
-		}
-	}
-
 }
 

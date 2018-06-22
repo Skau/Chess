@@ -417,6 +417,15 @@ void ABoard::SpawnChessPieces()
 
 void ABoard::UpdateChessPiecesLeft(AChessPiece* ChessPieceToRemove, bool IfWhite)
 {
+	if (ChessPieceToRemove->GetPieceType() == EPieceType::King)
+	{
+		if (GameMode)
+		{
+			GameMode->SetGameIsOver(!IfWhite);
+			return;
+		}
+	}
+
 	if (IfWhite)
 	{
 		AllWhitePieces.Remove(ChessPieceToRemove);

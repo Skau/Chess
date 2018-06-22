@@ -68,5 +68,7 @@ private:
 	bool bPieceIsCapturing = false;
 
 	bool bMenuWindowIsOpen = true;
+
+	bool bFinishedCleaningUp = false;
 	
 };

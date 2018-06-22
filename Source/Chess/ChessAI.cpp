@@ -33,19 +33,14 @@ void AChessAI::Tick(float DeltaTime)
 void AChessAI::StartRound(ABoard *& GameBoard)
 {
 	auto Moves = FindAllPossibleMoves(GameBoard);
-	// Random number in range
+
 	int MoveIndex = FMath::RandRange(0, GameBoard->GetAllBlackPieces().Num() - 1);
-	//UE_LOG(LogTemp, Warning, TEXT("Index: %i"), MoveIndex)
-	//UE_LOG(LogTemp, Warning, TEXT("AllPossibleMoves.Num(): %i"), AllPossibleMoves.Num())
+
 	if (Moves.Num() >= MoveIndex)
 	{
 		auto Piece = Moves[MoveIndex].ChessPiece;
-		//UE_LOG(LogTemp, Warning, TEXT("Piece name: %s"), *Piece->GetName())
-		//Piece->SetblackMaterialHighlighted();
 
 		auto Tile = Moves[MoveIndex].PossibleTileToMove;
-		//UE_LOG(LogTemp, Warning, TEXT("Tile name: %s"), *Tile->GetTileName().ToString())
-		//Tile->SetHighlightedPossibleMoveMaterial();
 		
 		MovePiece(Moves[MoveIndex]);
 
@@ -55,19 +50,13 @@ void AChessAI::StartRound(ABoard *& GameBoard)
 		}
 		Moves.Empty();
 	}
-	else
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Out of range"))
-	}
 }
 
 void AChessAI::MovePiece(FMove& Move)
 {
 	if (Move.ChessPiece && Move.PossibleTileToMove)
 	{
-		// Move to the new tile
 		Move.ChessPiece->MoveToNewTile(Move.PossibleTileToMove);
-
 	}
 		GameMode->ToggleTurn();
 }

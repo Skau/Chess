@@ -36,8 +36,9 @@ public:
 
 	void SetDefaultMaterial();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool GetIsWhite() { return bIsWhite; }
-
+	
 	FName GetCurrentTileName();
 
 	ATile*& GetCurrentTile() { return CurrentTile; }

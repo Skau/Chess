@@ -46,6 +46,7 @@ public:
 
 	void SetName(FName NewName) { TileName = NewName; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FName GetTileName() { return TileName; }
 
 	bool GetHasChessPiece() { return CurrentChessPiece ? true : false; }

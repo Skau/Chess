@@ -29,7 +29,22 @@ void ACustomPlayerController::Tick(float DeltaTime)
 
 	GetHitResultUnderCursorByChannel(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_GameTraceChannel1), 0, CursorHitResult);
 
-	OnHover();
+	if (!GameMode->GetIfGameIsOver())
+	{
+		OnHover();
+	}
+	else
+	{
+		if (!bFinishedCleaningUp)
+		{
+			ResetHoveringChessPiece();
+			ResetHoveringTile();
+
+			ResetSelectedChessPieceTiles();
+
+			bFinishedCleaningUp = true;
+		}
+	}
 }
 
 void ACustomPlayerController::SetupInputComponent()
@@ -55,25 +70,17 @@ void ACustomPlayerController::RestartGame()
 
 void ACustomPlayerController::OnHover()
 {
-	if (CursorHitResult.bBlockingHit)
+	if (!GameMode->GetIfGameIsOver())
 	{
-		// If hovering a chess piece
-		if (CursorHitResult.Actor->IsA(AChessPiece::StaticClass()))
+		if (CursorHitResult.bBlockingHit)
 		{
-			auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
-			if (Piece)
+			// If hovering a chess piece
+			if (CursorHitResult.Actor->IsA(AChessPiece::StaticClass()))
 			{
-				if (GameMode->GetIfPlayingAgainstPlayer())
+				auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
+				if (Piece)
 				{
-					// In case a chess piece or tile was already hovered
-					ResetHoveringChessPiece();
-					ResetHoveringTile();
-
-					UpdateHoveringChessPiece();
-				}
-				else
-				{
-					if (Piece->GetIsWhite() && GameMode->GetIsWhiteTurn() || Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+					if (GameMode->GetIfPlayingAgainstPlayer())
 					{
 						// In case a chess piece or tile was already hovered
 						ResetHoveringChessPiece();
@@ -81,27 +88,37 @@ void ACustomPlayerController::OnHover()
 
 						UpdateHoveringChessPiece();
 					}
+					else
+					{
+						if (Piece->GetIsWhite() && GameMode->GetIsWhiteTurn() || Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+						{
+							// In case a chess piece or tile was already hovered
+							ResetHoveringChessPiece();
+							ResetHoveringTile();
+
+							UpdateHoveringChessPiece();
+						}
+					}
 				}
 			}
+			// If hovering a tile
+			else if (CursorHitResult.Actor->IsA(ATile::StaticClass()))
+			{
+				// In case a tile or chess piece was already hovered
+				ResetHoveringTile();
+				ResetHoveringChessPiece();
+
+				UpdateHoveringTile();
+			}
 		}
-		// If hovering a tile
-		else if (CursorHitResult.Actor->IsA(ATile::StaticClass()))
+		// If mouse is off the board
+		else
 		{
-			// In case a tile or chess piece was already hovered
-			ResetHoveringTile();
+			// Resets all hovering
 			ResetHoveringChessPiece();
-
-			UpdateHoveringTile();
+			ResetHoveringTile();
 		}
 	}
-	// If mouse is off the board
-	else
-	{
-		// Resets all hovering
-		ResetHoveringChessPiece();
-		ResetHoveringTile();
-	}
-
 }
 
 void ACustomPlayerController::OnLeftClick()
