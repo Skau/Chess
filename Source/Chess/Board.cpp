@@ -130,7 +130,6 @@ void ABoard::SpawnTiles(bool bIsTemp)
 			}
 
 			Tile->SetActorRelativeLocation(SpawnLocation);
-			Tile->SetName(FName(*(FString("Tile") + FString::FromInt(i))));
 			Tile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			Tile->index = i;
 			FString Name = Letter + FString::FromInt(Number);
@@ -460,22 +459,22 @@ ABoard* ABoard::CreateTempGameBoard()
 
 	for (auto Piece : AllWhitePieces)
 	{
-		SpawnChessPiece(BoardToReturn, Piece, Piece->GetCurrentTile());
+		SpawnChessPiecesTemp(BoardToReturn, Piece, Piece->GetCurrentTile());
 	}
 
 	for (auto Piece : AllBlackPieces)
 	{
-		SpawnChessPiece(BoardToReturn, Piece, Piece->GetCurrentTile());
+		SpawnChessPiecesTemp(BoardToReturn, Piece, Piece->GetCurrentTile());
 	}
 
 	return BoardToReturn;
 }
 
-void ABoard::SpawnChessPiece(ABoard*& GameBoard, class AChessPiece* ChessPieceToCopy, ATile* TileToSpawnOn)
+void ABoard::SpawnChessPiecesTemp(ABoard*& GameBoard, AChessPiece* ChessPieceToCopy, ATile* TileToSpawnOn)
 {
-	for (auto Tile : GameBoard->Tiles)
+	for (auto& Tile : GameBoard->Tiles)
 	{
-		if (ChessPieceToCopy->GetCurrentTileName() == Tile->GetTileName())
+		if (TileToSpawnOn->GetTileName().IsEqual(Tile->GetTileName()))
 		{
 			FVector SpawnLocation = FVector(Tile->GetActorLocation().X, Tile->GetActorLocation().Y, 20);
 			auto Type = ChessPieceToCopy->GetPieceType();
@@ -520,10 +519,12 @@ void ABoard::SpawnChessPiece(ABoard*& GameBoard, class AChessPiece* ChessPieceTo
 
 			if (ChessPieceToCopy->GetIsWhite())
 			{
+				ChessPieceToCopy->SetWhiteMaterial();
 				GameBoard->AllWhitePieces.Add(NewChessPiece);
 			}
 			else
 			{
+				ChessPieceToCopy->SetBlackMaterial();
 				GameBoard->AllBlackPieces.Add(NewChessPiece);
 			}
 		}

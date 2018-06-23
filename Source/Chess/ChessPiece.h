@@ -49,8 +49,10 @@ public:
 
 	void MoveToNewTile(ATile*& NewTile);
 
-	int AI_TestMove(ATile*& NewTile, class ABoard*& GameBoard);
+	void AI_TestMove(ATile*& NewTile, class ABoard*& GameBoard);
 	
+	void AI_UndoTestMove(ATile*& OldTile, class ABoard*& GameBoard, AChessPiece*& CapturedPawn);
+
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)

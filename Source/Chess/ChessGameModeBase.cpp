@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "ChessAI.h"
 #include "ChessPiece.h"
+#include "TimerManager.h"
 
 
 AChessGameModeBase::AChessGameModeBase()
@@ -74,7 +75,8 @@ void AChessGameModeBase::ToggleTurn()
 			{
 				bIsWhiteTurn = false;
 				// AI
-				ChessAI->StartRound(GameBoard);
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AChessGameModeBase::ResetTimer, 0.1f);
+
 			}
 			else
 			{
@@ -82,5 +84,10 @@ void AChessGameModeBase::ToggleTurn()
 			}
 		}
 	}
+}
+
+void AChessGameModeBase::ResetTimer()
+{ 
+	ChessAI->StartRound(GameBoard);
 }
 

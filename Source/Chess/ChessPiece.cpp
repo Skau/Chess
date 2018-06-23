@@ -83,18 +83,38 @@ void AChessPiece::MoveToNewTile(ATile*& NewTile)
 	}
 }
 
-int AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
+void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 {
-	if (!NewTile || !CurrentTile) { return 0; }
+	if (!NewTile || !CurrentTile) { return; }
+
+	FString Color = "white";
+	FString OtherColor = "";
+	if (!bIsWhite)
+	{
+		Color = "black";
+		OtherColor = "white";
+	}
+
 
 	if (NewTile->GetIsPossibleMoveLocation())
 	{
 		if (NewTile->GetIsPossibleCaptureLocation())
 		{
-			GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
+			if (NewTile->GetChessPiece())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Capturing %s %s to %s:"), *OtherColor, *NewTile->GetChessPiece()->GetName(), *NewTile->GetTileName().ToString())
 
-			NewTile->GetChessPiece()->Destroy();
+				GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
+
+				NewTile->GetChessPiece()->Destroy();
+
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Moving %s %s to %s:"), *Color, *GetName(), *NewTile->GetTileName().ToString())
+		}
+
 		CurrentTile->SetChessPice(nullptr);
 
 		CurrentTile = NewTile;
@@ -103,16 +123,32 @@ int AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 
 		CurrentTile->SetChessPice(this);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Lol"))
+	}
+}
 
-	//if (NewTile->GetIsPossibleMoveLocation())
-	//{
-	//	if (NewTile->GetIsPossibleCaptureLocation())
-	//	{
-	//		MaterialValue = NewTile->GetChessPiece()->GetMaterialValue();
-	//	}
-	//}
+void AChessPiece::AI_UndoTestMove(ATile*& OldTile, ABoard *& GameBoard, AChessPiece*& CapturedPawn)
+{
+	if (!OldTile || !CurrentTile) { return; }
 
-	return MaterialValue;
+	if (OldTile->GetIsPossibleMoveLocation())
+	{
+		if (OldTile->GetIsPossibleCaptureLocation())
+		{
+			GameBoard->UpdateChessPiecesLeft(OldTile->GetChessPiece(), OldTile->GetChessPiece()->GetIsWhite());
+
+			OldTile->GetChessPiece()->Destroy();
+		}
+		CurrentTile->SetChessPice(nullptr);
+
+		CurrentTile = OldTile;
+
+		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
+
+		CurrentTile->SetChessPice(this);
+	}
 }
 
 void AChessPiece::SetWhiteMaterial()

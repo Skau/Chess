@@ -122,6 +122,7 @@ private:
 	bool bIsLightMaterial = false;
 	bool bIsDarkMaterial = false;
 
+	UPROPERTY(VisibleAnywhere)
 	AChessPiece* CurrentChessPiece = nullptr;
 
 	FVector ChessPieceLocation = FVector(GetActorLocation().X, GetActorLocation().Y, 20);

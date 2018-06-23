@@ -118,5 +118,7 @@ protected:
 	int WhiteBishopsLost = 0;
 	int WhiteQueenLost = 0;
 
+	FTimerHandle TimerHandle;
 
+	void ResetTimer();
 };

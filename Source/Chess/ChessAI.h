@@ -42,13 +42,17 @@ public:
 private:
 	AChessGameModeBase* GameMode = nullptr;
 
-	FMove CalculateBestMove(ABoard*& Gameboard, FMove& Move, int depth);
-
 	FMove MiniMaxRoot(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
 
-	int Minimax(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
+	int Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool IsMaximisingPlayer);
 
-	TArray<FMove> FindAllPossibleMoves(ABoard*& GameBoard);
+	TArray<FMove> FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
 
 	int EvaluateBoard(ABoard*& GameBoard);
+
+	int TotalNumberOfBoardEvaluates = 0;
+
+	TArray<ABoard*> AllTempBoards;
+
+	TArray<FMove> AllPossibleMoves;
 };

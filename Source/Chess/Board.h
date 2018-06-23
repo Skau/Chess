@@ -27,6 +27,8 @@ public:
 
 	void SpawnChessPieces();
 
+	void SpawnChessPiecesTemp(ABoard*& GameBoard, class AChessPiece* ChessPieceToCopy, ATile* TileToSpawnOn);
+
 	TArray<class AChessPiece*>& GetAllWhitePieces() { return AllWhitePieces; }
 
 	TArray<class AChessPiece*>& GetAllBlackPieces() { return AllBlackPieces; }
