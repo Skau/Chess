@@ -3,6 +3,20 @@
 #include "KnightPiece.h"
 #include "Tile.h"
 
+void AKnightPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 30;
+	}
+	else
+	{
+		MaterialValue = -30;
+	}
+}
+
 TArray<ATile*>& AKnightPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();

@@ -18,6 +18,7 @@ struct FMove
 
 	AChessPiece* ChessPiece = nullptr;
 	ATile* PossibleTileToMove = nullptr;
+	int Value = 0;
 };
 
 UCLASS()
@@ -41,5 +42,13 @@ public:
 private:
 	AChessGameModeBase* GameMode = nullptr;
 
+	FMove CalculateBestMove(ABoard*& Gameboard, FMove& Move, int depth);
+
+	FMove MiniMaxRoot(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
+
+	int Minimax(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
+
 	TArray<FMove> FindAllPossibleMoves(ABoard*& GameBoard);
+
+	int EvaluateBoard(ABoard*& GameBoard);
 };

@@ -3,6 +3,20 @@
 #include "KingPiece.h"
 #include "Tile.h"
 
+void AKingPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 900;
+	}
+	else
+	{
+		MaterialValue = -900;
+	}
+}
+
 TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();

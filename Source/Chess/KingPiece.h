@@ -13,7 +13,9 @@ UCLASS()
 class CHESS_API AKingPiece : public AChessPiece
 {
 	GENERATED_BODY()
-	
+
+	void BeginPlay() override;
+
 	virtual TArray<ATile*>& GetAllPossibleTiles() override;
 
 	TArray<ATile*> PossibleTilesToMove;

@@ -33,6 +33,10 @@ public:
 
 	void UpdateChessPiecesLeft(class AChessPiece* ChessPieceToRemove, bool IfWhite);
 
+	ABoard* CreateTempGameBoard();
+
+	void DestroyBoard();
+
 private:
 	// Sets default values for this actor's properties
 	ABoard();
@@ -43,7 +47,11 @@ private:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SpawnTiles();
+	void SpawnTiles(bool bIsTemp);
+
+	void SpawnChessPiece(ABoard*& GameBoard, class AChessPiece* ChessPieceToCopy, ATile* TileToSpawnOn);
+
+	ATile* GetTileByName(FName Tilename);
 
 	class AChessGameModeBase* GameMode = nullptr;
 

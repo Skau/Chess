@@ -80,6 +80,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void BroadCastMoveMade(class AChessPiece* ChessPieceMoved, class ATile* TileMovedFrom, ATile* TileMovedTo, bool WillCapture = false, AChessPiece* PieceTaken = nullptr);
 
+	TSubclassOf<AActor> GetBoardBP() { return Board; }
+
 protected:
 	AChessGameModeBase();
 

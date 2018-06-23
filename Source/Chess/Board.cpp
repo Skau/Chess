@@ -40,7 +40,7 @@ void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnTiles();
+	SpawnTiles(false);
 
 	GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
@@ -62,7 +62,7 @@ void ABoard::Tick(float DeltaTime)
 
 }
 
-void ABoard::SpawnTiles()
+void ABoard::SpawnTiles(bool bIsTemp)
 {
 	FString Letter = "h";
 	int Number = 1;
@@ -88,14 +88,30 @@ void ABoard::SpawnTiles()
 				if (bUseLightMaterial)
 				{
 					Tile->SetDarkMaterial();
-					SpawnLocation.X = 43.75;
-					SpawnLocation.Y -= 12.5;
+					if (!bIsTemp)
+					{
+						SpawnLocation.X = 43.75;
+						SpawnLocation.Y -= 12.5;
+					}
+					else
+					{
+						SpawnLocation.X = 20000;
+						SpawnLocation.Y -= 168.75;
+					}
 				}
 				else if (!bUseLightMaterial)
 				{
 					Tile->SetLightMaterial();
-					SpawnLocation.X = 43.75;
-					SpawnLocation.Y -= 12.5;
+					if (!bIsTemp)
+					{
+						SpawnLocation.X = 43.75;
+						SpawnLocation.Y -= 12.5;
+					}
+					else
+					{
+						SpawnLocation.X = 20000;
+						SpawnLocation.Y -= 168.75;
+					}
 				}
 			}
 			else
@@ -434,6 +450,134 @@ void ABoard::UpdateChessPiecesLeft(AChessPiece* ChessPieceToRemove, bool IfWhite
 	{
 		AllBlackPieces.Remove(ChessPieceToRemove);
 	}
+}
+
+ABoard* ABoard::CreateTempGameBoard()
+{
+	auto BoardToReturn = GetWorld()->SpawnActor<ABoard>(GameMode->GetBoardBP(), FVector(50000,50000,50000), FRotator(0));
+
+	BoardToReturn->SpawnTiles(true);
+
+	for (auto Piece : AllWhitePieces)
+	{
+		SpawnChessPiece(BoardToReturn, Piece, Piece->GetCurrentTile());
+	}
+
+	for (auto Piece : AllBlackPieces)
+	{
+		SpawnChessPiece(BoardToReturn, Piece, Piece->GetCurrentTile());
+	}
+
+	return BoardToReturn;
+}
+
+void ABoard::SpawnChessPiece(ABoard*& GameBoard, class AChessPiece* ChessPieceToCopy, ATile* TileToSpawnOn)
+{
+	for (auto Tile : GameBoard->Tiles)
+	{
+		if (ChessPieceToCopy->GetCurrentTileName() == Tile->GetTileName())
+		{
+			FVector SpawnLocation = FVector(Tile->GetActorLocation().X, Tile->GetActorLocation().Y, 20);
+			auto Type = ChessPieceToCopy->GetPieceType();
+			AChessPiece* NewChessPiece = nullptr;
+			switch (Type)
+			{
+			case EPieceType::Pawn:
+				NewChessPiece = GetWorld()->SpawnActor<APawnPiece>(
+					PawnPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::Pawn);
+				break;
+			case EPieceType::Rook:
+				NewChessPiece = GetWorld()->SpawnActor<ARookPiece>(
+					RookPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::Rook);
+				break;
+			case EPieceType::Knight:
+				NewChessPiece = GetWorld()->SpawnActor<AKnightPiece>(
+					KnightPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::Knight);
+				break;
+			case EPieceType::Bishop:
+				NewChessPiece = GetWorld()->SpawnActor<ABishopPiece>(
+					BishopPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::Bishop);
+				break;
+			case EPieceType::King:
+				NewChessPiece = GetWorld()->SpawnActor<AKingPiece>(
+					KingPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::King);
+				break;
+			case EPieceType::Queen:
+				NewChessPiece = GetWorld()->SpawnActor<AQueenPiece>(
+					QueenPiece, SpawnLocation, FRotator(0));
+				NewChessPiece->SetPieceType(EPieceType::Queen);
+				break;
+			default:
+				break;
+			}
+			NewChessPiece->SetCurrentTile(Tile);
+			Tile->SetChessPice(NewChessPiece);
+
+			if (ChessPieceToCopy->GetIsWhite())
+			{
+				GameBoard->AllWhitePieces.Add(NewChessPiece);
+			}
+			else
+			{
+				GameBoard->AllBlackPieces.Add(NewChessPiece);
+			}
+		}
+	}
+}
+
+ATile* ABoard::GetTileByName(FName Tilename)
+{
+	ATile* TileToReturn = nullptr;
+
+	for (auto& Tile : Tiles)
+	{
+		if (Tile->GetTileName() == Tilename)
+		{
+			TileToReturn = Tile;
+			return TileToReturn;
+		}
+	}
+
+	return TileToReturn;
+}
+
+void ABoard::DestroyBoard()
+{
+	for (auto& Piece : AllWhitePieces)
+	{
+		if (Piece)
+		{
+			//AllWhitePieces.Remove(Piece);
+			Piece->Destroy();
+			//Piece = nullptr;
+		}
+	}
+
+	for (auto& Piece : AllBlackPieces)
+	{
+		if (Piece)
+		{
+			//AllWhitePieces.Remove(Piece);
+			Piece->Destroy();
+			//Piece = nullptr;
+		}
+	}
+
+	for (auto& Tile : Tiles)
+	{
+		if (Tile)
+		{
+			//Tiles.Remove(Tile);
+			Tile->Destroy();
+			//Tile = nullptr;
+		}
+	}
+	Destroy();
 }
 
 TArray<ATile*>& ABoard::GetAllTilesUp(ATile* StartingTile)

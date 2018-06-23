@@ -3,6 +3,20 @@
 #include "QueenPiece.h"
 #include "Tile.h"
 
+void AQueenPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 90;
+	}
+	else
+	{
+		MaterialValue = -90;
+	}
+}
+
 TArray<ATile*>& AQueenPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();

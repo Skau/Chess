@@ -3,6 +3,21 @@
 #include "BishopPiece.h"
 #include "Tile.h"
 
+
+void ABishopPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 30;
+	}
+	else
+	{
+		MaterialValue = -30;
+	}
+}
+
 TArray<ATile*>& ABishopPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();

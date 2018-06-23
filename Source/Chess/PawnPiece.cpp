@@ -15,6 +15,15 @@ APawnPiece::APawnPiece()
 void APawnPiece::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 10;
+	}
+	else
+	{
+		MaterialValue = -10;
+	}
 }
 
 void APawnPiece::Tick(float DeltaTime)

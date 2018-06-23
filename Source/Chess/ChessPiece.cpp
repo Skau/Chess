@@ -57,11 +57,10 @@ TArray<ATile*>& AChessPiece::GetAllPossibleTiles()
 
 void AChessPiece::MoveToNewTile(ATile*& NewTile)
 {
-	if (!NewTile || !CurrentTile) { UE_LOG(LogTemp, Warning, TEXT("NewTile or CurrentTile == nullptr")) return; }
+	if (!NewTile || !CurrentTile) {return; }
 
 	if (NewTile->GetIsPossibleMoveLocation())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Is possible move location"))
 		if (NewTile->GetIsPossibleCaptureLocation())
 		{
 			if (GameMode)
@@ -69,27 +68,51 @@ void AChessPiece::MoveToNewTile(ATile*& NewTile)
 				GameMode->GetGameBoard()->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
 			}
 			NewTile->GetChessPiece()->Destroy();
-			//GameBoard->CapturePiece(NewTile->GetChessPiece());
 		}
-		UE_LOG(LogTemp, Warning, TEXT("CurrentTile->SetChessPice(nullptr);"))
 		CurrentTile->SetChessPice(nullptr);
-		UE_LOG(LogTemp, Warning, TEXT("CurrentTile = NewTile;"))
+
 		CurrentTile = NewTile;
-		UE_LOG(LogTemp, Warning, TEXT("SetActorLocation"))
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20).ToString())
 
 		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
-		UE_LOG(LogTemp, Warning, TEXT("CurrentTile->SetChessPice(this);"))
+
 		CurrentTile->SetChessPice(this);
 		if (bIsFirstMove)
 		{
 			bIsFirstMove = false;
 		}
 	}
-	else
+}
+
+int AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
+{
+	if (!NewTile || !CurrentTile) { return 0; }
+
+	if (NewTile->GetIsPossibleMoveLocation())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Is not possible move location!"))
+		if (NewTile->GetIsPossibleCaptureLocation())
+		{
+			GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
+
+			NewTile->GetChessPiece()->Destroy();
+		}
+		CurrentTile->SetChessPice(nullptr);
+
+		CurrentTile = NewTile;
+
+		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
+
+		CurrentTile->SetChessPice(this);
 	}
+
+	//if (NewTile->GetIsPossibleMoveLocation())
+	//{
+	//	if (NewTile->GetIsPossibleCaptureLocation())
+	//	{
+	//		MaterialValue = NewTile->GetChessPiece()->GetMaterialValue();
+	//	}
+	//}
+
+	return MaterialValue;
 }
 
 void AChessPiece::SetWhiteMaterial()

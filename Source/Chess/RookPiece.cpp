@@ -2,6 +2,21 @@
 
 #include "RookPiece.h"
 #include "Tile.h"
+
+void ARookPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GetIsWhite())
+	{
+		MaterialValue = 50;
+	}
+	else
+	{
+		MaterialValue = -50;
+	}
+}
+
 TArray<ATile*>& ARookPiece::GetAllPossibleTiles()
 {
 	PossibleTilesToMove.Empty();

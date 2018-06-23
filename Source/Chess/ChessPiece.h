@@ -48,11 +48,15 @@ public:
 	virtual TArray<ATile*>& GetAllPossibleTiles();
 
 	void MoveToNewTile(ATile*& NewTile);
+
+	int AI_TestMove(ATile*& NewTile, class ABoard*& GameBoard);
 	
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EPieceType GetPieceType() { return Type; }
+
+	int GetMaterialValue() { return MaterialValue; }
 
 	virtual ~AChessPiece() = default;
 protected:
@@ -96,4 +100,6 @@ protected:
 	bool bIsFirstMove = true;
 
 	EPieceType Type = EPieceType::None;
+
+	int MaterialValue = 0;
 };
