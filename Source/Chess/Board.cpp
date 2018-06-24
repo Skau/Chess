@@ -455,14 +455,14 @@ ABoard* ABoard::CreateTempGameBoard()
 {
 	auto BoardToReturn = GetWorld()->SpawnActor<ABoard>(GameMode->GetBoardBP(), FVector(50000,50000,50000), FRotator(0));
 
-	BoardToReturn->SpawnTiles(true);
+	//BoardToReturn->SpawnTiles(true);
 
-	for (auto Piece : AllWhitePieces)
+	for (auto& Piece : AllWhitePieces)
 	{
 		SpawnChessPiecesTemp(BoardToReturn, Piece, Piece->GetCurrentTile());
 	}
 
-	for (auto Piece : AllBlackPieces)
+	for (auto& Piece : AllBlackPieces)
 	{
 		SpawnChessPiecesTemp(BoardToReturn, Piece, Piece->GetCurrentTile());
 	}

@@ -46,7 +46,7 @@ private:
 
 	int Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool IsMaximisingPlayer);
 
-	TArray<FMove> FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
+	TArray<FMove>& FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
 
 	int EvaluateBoard(ABoard*& GameBoard);
 
@@ -54,5 +54,5 @@ private:
 
 	TArray<ABoard*> AllTempBoards;
 
-	TArray<FMove> AllPossibleMoves;
+	TArray<FMove> PossibleTilesToMove;
 };

@@ -31,19 +31,17 @@ void AChessAI::Tick(float DeltaTime)
 
 }
 
-void AChessAI::StartRound(ABoard *& GameBoard)
+void AChessAI::StartRound(ABoard*& GameBoard)
 {
-	//Calculate etc..
-	FMove Move = MiniMaxRoot(GameBoard, 2, true);
-
-	TArray<FMove> AllPossibleMoves = FindAllPossibleMoves(GameBoard, false);
+	FMove Move = MiniMaxRoot(GameBoard, 1, true);
+	FindAllPossibleMoves(GameBoard,  false);
 
 	if (Move.ChessPiece)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Move.Value = %i"), Move.Value)
-		if (Move.Value < AllPossibleMoves.Num())
+		if (Move.Value < PossibleTilesToMove.Num())
 		{
-			MovePiece(AllPossibleMoves[Move.Value]);
+			MovePiece(PossibleTilesToMove[Move.Value]);
 		}
 	}
 	else
@@ -52,7 +50,7 @@ void AChessAI::StartRound(ABoard *& GameBoard)
 	}
 
 
-	for (auto& Move : AllPossibleMoves)
+	for (auto& Move : PossibleTilesToMove)
 	{
 		if (Move.PossibleTileToMove)
 		{
@@ -88,32 +86,33 @@ FMove AChessAI::MiniMaxRoot(ABoard *& Gameboard, int depth, bool IsMaximisingPla
 {
 	FMove BestMoveFound;
 	int BestMove = -9999;
-
-	TArray<FMove> PossibleMoves = FindAllPossibleMoves(Gameboard, !IsMaximisingPlayer);
-	
-	for (int i = 0; i < PossibleMoves.Num(); ++i)
+	auto Board = Gameboard->CreateTempGameBoard();
+	AllTempBoards.Add(Board);
+	auto RootMoves = FindAllPossibleMoves(Board, !IsMaximisingPlayer);
+	UE_LOG(LogTemp, Warning, TEXT("MINIMAXROOT: RootMoves.Num(): %i"), RootMoves.Num())
+	for (int i = 0; i < RootMoves.Num(); ++i)
 	{
+		if (!Board)
+		{
+			Board = Gameboard->CreateTempGameBoard();
+		}
+
 		FMove Move;
-		auto TempBoard = Gameboard->CreateTempGameBoard();
-		AllTempBoards.Add(TempBoard);
-		TArray<FMove> AllPossibleMoves = FindAllPossibleMoves(TempBoard, !IsMaximisingPlayer);
-		UE_LOG(LogTemp, Warning, TEXT("ROOT: RootMoves.Num(): %i"), AllPossibleMoves.Num())
-		Move = AllPossibleMoves[i];
+		Move = RootMoves[i];
 
 		if (Move.ChessPiece)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ROOT: Move.Chesspiece is valid!"))
+			UE_LOG(LogTemp, Warning, TEXT("MINIMAXROOT: Move.Chesspiece is valid!"))
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ROOT: Move.Chesspiece is NOT valid!"))
+			UE_LOG(LogTemp, Warning, TEXT("MINIMAXROOT: Move.Chesspiece is NOT valid!"))
 		}
 
-		Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, TempBoard);
+		Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, Board);
+		int Value = Minimax(Board, depth - 1, -10000, 10000, !IsMaximisingPlayer);
 
-		int Value = Minimax(TempBoard, depth - 1, -10000, 10000, !IsMaximisingPlayer);
-
-		TempBoard->DestroyBoard();
+		Board->DestroyBoard();
 
 		if (Value > BestMove)
 		{
@@ -127,96 +126,102 @@ FMove AChessAI::MiniMaxRoot(ABoard *& Gameboard, int depth, bool IsMaximisingPla
 
 int AChessAI::Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool IsMaximisingPlayer)
 {
-	if (depth <= 0)
+	if (depth == 0)
 	{
 		return -EvaluateBoard(Gameboard);
 	}
 
 	auto RootBoard = Gameboard->CreateTempGameBoard();
 	AllTempBoards.Add(RootBoard);
-	TArray<FMove> RootMoves = FindAllPossibleMoves(RootBoard, !IsMaximisingPlayer);
-	UE_LOG(LogTemp, Warning, TEXT("MINIMAX: RootMoves.Num(): %i"), RootMoves.Num())
-	if (IsMaximisingPlayer)
+	TArray<FMove>& RootMoves = FindAllPossibleMoves(RootBoard, !IsMaximisingPlayer);
+
+	if (RootMoves.Num())
 	{
-		int BestMove = -9999;
-		for (int i = 0; i < RootMoves.Num(); ++i)
+		UE_LOG(LogTemp, Warning, TEXT("MINIMAX: RootMoves.Num(): %i"), RootMoves.Num())
+		if (IsMaximisingPlayer)
 		{
-			auto TempBoard = Gameboard->CreateTempGameBoard();
-			AllTempBoards.Add(TempBoard);
-			TArray<FMove> PossibleMoves = FindAllPossibleMoves(TempBoard, !IsMaximisingPlayer);
-			FMove Move;
-			UE_LOG(LogTemp, Warning, TEXT("MINIMAX: IsMaximisingPlayer - i: %i"), i)
-
-			Move = PossibleMoves[i];
-
-			if (Move.ChessPiece)
+			int BestMove = -9999;
+			for (int i = 0; i < RootMoves.Num(); ++i)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is valid!"))
+				auto TempBoard = Gameboard->CreateTempGameBoard();
+				AllTempBoards.Add(TempBoard);
+				auto Moves = FindAllPossibleMoves(TempBoard, !IsMaximisingPlayer);
+				FMove Move;
+				UE_LOG(LogTemp, Warning, TEXT("MINIMAX: IsMaximisingPlayer - i: %i"), i)
+				Move = Moves[i];
+
+				if (Move.ChessPiece)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is valid!"))
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is NOT valid!"))
+				}
+
+				Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, TempBoard);
+
+				BestMove = FMath::Max(BestMove, Minimax(TempBoard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
+
+				TempBoard->DestroyBoard();
+
+				Alpha = FMath::Max(Alpha, BestMove);
+				if (Beta <= Alpha)
+				{
+					return BestMove;
+				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is NOT valid!"))
-			}
-
-			Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, TempBoard);
-
-			BestMove = FMath::Max(BestMove, Minimax(TempBoard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
-
-			TempBoard->DestroyBoard();
-
-			Alpha = FMath::Max(Alpha, BestMove);
-			if (Beta <= Alpha)
-			{
-				return BestMove;
-			}
-			
+			return BestMove;
 		}
-		return BestMove;
+		else
+		{
+			int BestMove = 9999;
+			for (int i = 0; i < RootMoves.Num(); ++i)
+			{
+				auto TempBoard = Gameboard->CreateTempGameBoard();
+				AllTempBoards.Add(TempBoard);
+				auto Moves = FindAllPossibleMoves(TempBoard, !IsMaximisingPlayer);
+				FMove Move;
+				UE_LOG(LogTemp, Warning, TEXT("!IsMaximisingPlayer - i: %i"), i)
+					if (i < Moves.Num())
+						Move = Moves[i];
+
+				if (Move.ChessPiece)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is valid!"))
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is NOT valid!"))
+				}
+
+				Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, TempBoard);
+
+				BestMove = FMath::Min(BestMove, Minimax(TempBoard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
+
+				TempBoard->DestroyBoard();
+
+				Beta = FMath::Min(Beta, BestMove);
+				if (Beta <= Alpha)
+				{
+					return BestMove;
+				}
+
+			}
+			return BestMove;
+		}
 	}
 	else
 	{
-		int BestMove = 9999;
-		for (int i = 0; i < RootMoves.Num(); ++i)
-		{
-
-			auto TempBoard = Gameboard->CreateTempGameBoard();
-			AllTempBoards.Add(TempBoard);
-			TArray<FMove> PossibleMoves = FindAllPossibleMoves(TempBoard, !IsMaximisingPlayer);
-			FMove Move;
-			UE_LOG(LogTemp, Warning, TEXT("!IsMaximisingPlayer - i: %i"), i)
-
-			Move = PossibleMoves[i];
-
-			if (Move.ChessPiece)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is valid!"))
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("MINIMAX: Move.Chesspiece is NOT valid!"))
-			}
-
-			Move.ChessPiece->AI_TestMove(Move.PossibleTileToMove, TempBoard);
-
-			BestMove = FMath::Min(BestMove, Minimax(TempBoard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
-
-			TempBoard->DestroyBoard();
-
-			Beta = FMath::Min(Beta, BestMove);
-			if (Beta <= Alpha)
-			{
-				return BestMove;
-			}
-			
-		}
-		return BestMove;
+		UE_LOG(LogTemp, Warning, TEXT("MINIMAX: RootMoves.Num() == 0!"))
 	}
+	return 0;
 }
 
-// TODO: Fix.. Returns empty in Minimax (also random crash when black captured white)
-TArray<FMove> AChessAI::FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer)
+TArray<FMove>& AChessAI::FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer)
 {
-	TArray<FMove> Moves;
+	PossibleTilesToMove.Empty();
+
 	FMove NewMove;
 	NewMove.ChessPiece = nullptr;
 	NewMove.PossibleTileToMove = nullptr;
@@ -225,12 +230,15 @@ TArray<FMove> AChessAI::FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisi
 	{
 		for (auto& Piece : GameBoard->GetAllWhitePieces())
 		{
+			int index = 0;
 			for (auto& Tile : Piece->GetAllPossibleTiles())
 			{
 				Tile->SetIsPossibleMoveLocation(true);
 				NewMove.ChessPiece = Piece;
 				NewMove.PossibleTileToMove = Tile;
-				Moves.Add(NewMove);
+				NewMove.Value = index;
+				PossibleTilesToMove.Add(NewMove);
+				index++;
 			}
 		}
 	}
@@ -238,19 +246,22 @@ TArray<FMove> AChessAI::FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisi
 	{
 		for (auto& Piece : GameBoard->GetAllBlackPieces())
 		{
+			int index = 0;
 			for (auto& Tile : Piece->GetAllPossibleTiles())
 			{
 				Tile->SetIsPossibleMoveLocation(true);
 				NewMove.ChessPiece = Piece;
 				NewMove.PossibleTileToMove = Tile;
-				Moves.Add(NewMove);
+				NewMove.Value = index;
+				PossibleTilesToMove.Add(NewMove);
+				index++;
 			}
 		}
 	}
-	return Moves;
+	return PossibleTilesToMove;
 }
 
-int AChessAI::EvaluateBoard(ABoard *& GameBoard)
+int AChessAI::EvaluateBoard(ABoard*& GameBoard)
 {
 	TotalNumberOfBoardEvaluates++;
 	int Value = 0;
