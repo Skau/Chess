@@ -31,7 +31,7 @@ void APawnPiece::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
+TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 {
 	AllPossibleTiles.Empty();
 
@@ -87,6 +87,7 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			{
 				if (CurrentTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
+					CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleMoveLocation(true);
 					CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftDown());
 				}
@@ -99,6 +100,7 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			{
 				if (CurrentTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
+					CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleMoveLocation(true);
 					CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftUp());
 				}
@@ -114,6 +116,7 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			{
 				if (CurrentTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
+					CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleMoveLocation(true);
 					CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightUp());
 				}
@@ -126,6 +129,7 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles()
 			{
 				if (CurrentTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
 				{
+					CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleMoveLocation(true);
 					CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightDown());
 				}

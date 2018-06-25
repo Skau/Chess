@@ -11,14 +11,38 @@ class ATile;
 class ABoard;
 class AChessGameModeBase;
 
-USTRUCT()
+USTRUCT(immutable, noexport, BlueprintType)
 struct FMove
 {
-	GENERATED_BODY()
-
+	UPROPERTY()
 	AChessPiece* ChessPiece = nullptr;
+
+	UPROPERTY()
 	ATile* PossibleTileToMove = nullptr;
+
+	UPROPERTY()
 	int Value = 0;
+
+	FMove()
+	{
+		ChessPiece = nullptr;
+		PossibleTileToMove = nullptr;
+		Value = 0;
+	}
+
+	FMove(FMove*& Move)
+	{
+		ChessPiece = Move->ChessPiece;
+		PossibleTileToMove = Move->PossibleTileToMove;
+		Value = Move->Value;
+	}
+
+	FMove(AChessPiece*& ChessPieceToAdd, ATile*& TileToAdd, int ValueToAdd = 0)
+	{
+		ChessPiece = ChessPieceToAdd;
+		PossibleTileToMove = TileToAdd;
+		Value = ValueToAdd;
+	}
 };
 
 UCLASS()
@@ -38,21 +62,25 @@ public:
 
 	void StartRound(ABoard*& GameBoard);
 
-	void MovePiece(FMove& Move);
+	void MovePiece(FMove*& Move, ABoard*& Gameboard);
 private:
 	AChessGameModeBase* GameMode = nullptr;
 
-	FMove MiniMaxRoot(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
+	FMove* MiniMaxRoot(ABoard*& Gameboard, int depth, bool IsMaximisingPlayer);
 
 	int Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool IsMaximisingPlayer);
 
-	TArray<FMove>& FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
+	TArray<FMove*>& FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
 
 	int EvaluateBoard(ABoard*& GameBoard);
+
+	void Undo(ABoard*& Gameboard);
 
 	int TotalNumberOfBoardEvaluates = 0;
 
 	TArray<ABoard*> AllTempBoards;
 
-	TArray<FMove> PossibleTilesToMove;
+	TArray<ATile*> SavedTiles;
+
+	TArray<FMove*> PossibleTilesToMove;
 };

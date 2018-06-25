@@ -18,23 +18,23 @@ void ABishopPiece::BeginPlay()
 	}
 }
 
-TArray<ATile*>& ABishopPiece::GetAllPossibleTiles()
+TArray<ATile*>& ABishopPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
 	PossibleTilesToMove.Empty();
 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTUP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTUP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTUP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTUP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}

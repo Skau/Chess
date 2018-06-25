@@ -7,6 +7,12 @@
 #include "Board.generated.h"
 
 class ATile;
+class ABoard;
+class AChessPiece;
+
+typedef ATile* ATilePtr;
+typedef ABoard* ABoardPtr;
+typedef AChessPiece* AChessPiecePtr;
 
 UCLASS()
 class CHESS_API ABoard : public AActor
@@ -16,14 +22,14 @@ class CHESS_API ABoard : public AActor
 public:
 	TArray<ATile*>& GetAllTiles() { return Tiles; }
 
-	TArray<ATile*>& GetAllTilesUp(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesDown(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesLeft(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesRight(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile* StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile* StartingTile);
+	TArray<ATile*>& GetAllTilesUp(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesDown(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesLeft(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesRight(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile*& StartingTile);
 
 	void SpawnChessPieces();
 
@@ -35,9 +41,15 @@ public:
 
 	void UpdateChessPiecesLeft(class AChessPiece* ChessPieceToRemove, bool IfWhite);
 
+	void UpdateTilePointers();
+
 	ABoard* CreateTempGameBoard();
 
 	void DestroyBoard();
+
+	void SaveCurrentChessPieces(bool IsRoot);
+
+	void ResetAllChessPiecesToCurrentState();
 
 private:
 	// Sets default values for this actor's properties

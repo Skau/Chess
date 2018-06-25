@@ -99,40 +99,16 @@ void ATile::SetDefaultMaterial()
 	}
 }
 
-void ATile::SetAllTilesAroundBlue()
+bool ATile::GetHasChessPiece()
 {
-	if (TileUp)
+	bool Bool = false;
+
+	if (CurrentChessPiece)
 	{
-		TileUp->SetPossibleMoveMaterial();
+		Bool = true;
 	}
-	if (TileDown)
-	{
-		TileDown->SetPossibleMoveMaterial();
-	}
-	if (TileLeft)
-	{
-		TileLeft->SetPossibleMoveMaterial();
-	}
-	if (TileRight)
-	{
-		TileRight->SetPossibleMoveMaterial();
-	}
-	if (TileDiagonalRightUp)
-	{
-		TileDiagonalRightUp->SetPossibleMoveMaterial();
-	}
-	if (TileDiagonalLeftUp)
-	{
-		TileDiagonalLeftUp->SetPossibleMoveMaterial();
-	}
-	if (TileDiagonalRightDown)
-	{
-		TileDiagonalRightDown->SetPossibleMoveMaterial();
-	}
-	if (TileDiagonalLeftDown)
-	{
-		TileDiagonalLeftDown->SetPossibleMoveMaterial();
-	}
+
+	return Bool;
 }
 
 void ATile::SetDarkMaterial()
@@ -144,80 +120,176 @@ void ATile::SetDarkMaterial()
 	}
 }
 
-TArray<ATile*>& ATile::GetAllTilesInADirection(ATile * StartTile, EDirection Direction)
+TArray<ATilePtr>& ATile::GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, ABoard*& Gameboard)
 {
 	AllTilesInADirection.Empty();
 
-	auto GameMode = Cast<AChessGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	auto GameBoard = GameMode->GetGameBoard();
-
-	switch (Direction)
+	if (StartTile)
 	{
-	case EDirection::UP:
-		for (auto& TileToAdd : GameBoard->GetAllTilesUp(StartTile))
+		switch (Direction)
 		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
+		case EDirection::UP:
+			for (auto& TileToAdd : Gameboard->GetAllTilesUp(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::DOWN:
+			for (auto& TileToAdd : Gameboard->GetAllTilesDown(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::LEFT:
+			for (auto& TileToAdd : Gameboard->GetAllTilesLeft(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::RIGHT:
+			for (auto& TileToAdd : Gameboard->GetAllTilesRight(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::DIARIGHTUP:
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightUp(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::DIARIGHTDOWN:
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightDown(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::DIALEFTUP:
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftUp(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		case EDirection::DIALEFTDOWN:
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftDown(StartTile))
+			{
+				TileToAdd->SetIsPossibleMoveLocation(true);
+				AllTilesInADirection.Add(TileToAdd);
+			}
+			break;
+		default:
+			break;
 		}
-		break;
-	case EDirection::DOWN:
-		for (auto& TileToAdd : GameBoard->GetAllTilesDown(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::LEFT:
-		for (auto& TileToAdd : GameBoard->GetAllTilesLeft(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::RIGHT:
-		for (auto& TileToAdd : GameBoard->GetAllTilesRight(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::DIARIGHTUP:
-		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightUp(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::DIARIGHTDOWN:
-		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalRightDown(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::DIALEFTUP:
-		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftUp(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	case EDirection::DIALEFTDOWN:
-		for (auto& TileToAdd : GameBoard->GetAllTilesDiagonalLeftDown(StartTile))
-		{
-			TileToAdd->SetIsPossibleMoveLocation(true);
-			AllTilesInADirection.Add(TileToAdd);
-		}
-		break;
-	default:
-		break;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GetAllTilesInADirection(StartTile) == nullptr!"))
 	}
 	return AllTilesInADirection;
 }
 
-ATile* ATile::GetSingleTile(ATile * StartTile, EDirection Direction, int NumberOfTilesAway)
+void ATile::TempRemoveChessPiece()
 {
-	ATile* TileToReturn = nullptr;
+	if (CurrentChessPiece)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TempRemoveChessPiece: %s gets set to TempRemovedChessPiece"), *CurrentChessPiece->GetName())
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TempRemoveChessPiece: CurrentChessPiece == nullptr! "))
+	}
 
-	return TileToReturn;
+	TempRemovedChessPiece = CurrentChessPiece;
+}
+
+void ATile::ResetTileToCurrentState()
+{
+	if (TempRemovedChessPiece)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece is valid"))
+			if (CurrentChessPiece)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece = %s"), *CurrentChessPiece->GetName())
+			}
+
+		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece(%s) gets set to CurrentChessPiece"), *TempRemovedChessPiece->GetName())
+			CurrentChessPiece = TempRemovedChessPiece;
+		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece = nullptr"))
+			TempRemovedChessPiece = nullptr;
+	}
+
+	if (TempAddedChessPiece)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempAddedChessPiece is valid, setting to nullptr"))
+			if (CurrentChessPiece)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece is valid, setting to nullptr"))
+					CurrentChessPiece = nullptr;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece == nullptr! "))
+			}
+		TempAddedChessPiece = nullptr;
+	}
+}
+
+void ATile::ResetToRootChessPiece()
+{
+	if (RootChessPiece)
+	{
+		if (CurrentChessPiece)
+		{
+			if (RootChessPiece != CurrentChessPiece)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece is not equal to CurrentChessPiece! "))
+				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece(%s) gets set to CurrentChessPiece(currently %s)"), *RootChessPiece->GetName(), *CurrentChessPiece->GetName())
+				CurrentChessPiece = RootChessPiece;
+				RootChessPiece = nullptr;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece is equal to CurrentChessPiece! "))
+				RootChessPiece = nullptr;
+			}
+
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: CurrentChessPiece(NULL) gets set to RootChessPiece(%s)"), *RootChessPiece->GetName())
+			CurrentChessPiece = RootChessPiece;
+			RootChessPiece = nullptr;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece == nullptr!"))
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: Nulling other pointers if they are valid"))
+
+	if (TempAddedChessPiece)
+	{
+		TempAddedChessPiece = nullptr;
+	}
+
+	if (TempRemovedChessPiece)
+	{
+		TempRemovedChessPiece = nullptr;
+	}
+}
+
+void ATile::SetRootPieceFromCurrentChessPiece()
+{
+	if (CurrentChessPiece)
+	{
+		RootChessPiece = CurrentChessPiece;
+	}
 }

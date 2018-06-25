@@ -49,7 +49,7 @@ void AChessPiece::Tick(float DeltaTime)
 }
 
 // NOT IN USE
-TArray<ATile*>& AChessPiece::GetAllPossibleTiles()
+TArray<ATile*>& AChessPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 {
 	AllPossibleTiles.Empty();
 	return AllPossibleTiles;
@@ -69,9 +69,18 @@ void AChessPiece::MoveToNewTile(ATile*& NewTile)
 			}
 			NewTile->GetChessPiece()->Destroy();
 		}
+
+		UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: Moving %s to %s:"), *GetName(), *NewTile->GetTileName().ToString())
+
 		CurrentTile->SetChessPice(nullptr);
 
+		CurrentTile->SetRootPieceToNull();
+
 		CurrentTile = NewTile;
+
+		RootTile = CurrentTile;
+
+		CurrentTile->SetRootPieceFromCurrentChessPiece();
 
 		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
 
@@ -95,19 +104,24 @@ void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 		OtherColor = "white";
 	}
 
-
+	// Check if possible to move to the tile
 	if (NewTile->GetIsPossibleMoveLocation())
 	{
+		// If it will be a capture
 		if (NewTile->GetIsPossibleCaptureLocation())
 		{
+			// Get the chesspiece to capture
 			if (NewTile->GetChessPiece())
 			{
 				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Capturing %s %s to %s:"), *OtherColor, *NewTile->GetChessPiece()->GetName(), *NewTile->GetTileName().ToString())
 
-				GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
+				//GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
 
-				NewTile->GetChessPiece()->Destroy();
+				// Add the captured piece to the tile TempRemovePointer
+				NewTile->TempRemoveChessPiece();
 
+				// "Remove" the piece
+				NewTile->SetChessPice(nullptr);
 			}
 		}
 		else
@@ -115,13 +129,24 @@ void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 			UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Moving %s %s to %s:"), *Color, *GetName(), *NewTile->GetTileName().ToString())
 		}
 
+		// "Remove" current piece from current tile
 		CurrentTile->SetChessPice(nullptr);
 
+		// Set the new tile to be the current one
 		CurrentTile = NewTile;
 
-		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
+		// Set TempAddedChessPiece on new current tile
+		CurrentTile->TempAddChessPiece(this);
 
+		//SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
+
+		// Set the current tile's chesspiece to this one
 		CurrentTile->SetChessPice(this);
+		
+		if (bIsFirstMove)
+		{
+			bIsFirstMove = false;
+		}
 	}
 	else
 	{

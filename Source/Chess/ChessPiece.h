@@ -25,7 +25,7 @@ class CHESS_API AChessPiece : public AActor
 {
 	GENERATED_BODY()
 	
-public:
+public: 
 	void SetWhiteMaterial();
 
 	void SetWhiteMaterialHighlighted();
@@ -45,7 +45,7 @@ public:
 
 	void SetCurrentTile(ATile* NewTile) { CurrentTile = NewTile; }
 
-	virtual TArray<ATile*>& GetAllPossibleTiles();
+	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& Gameboard);
 
 	void MoveToNewTile(ATile*& NewTile);
 
@@ -59,6 +59,10 @@ public:
 	EPieceType GetPieceType() { return Type; }
 
 	int GetMaterialValue() { return MaterialValue; }
+
+	void SetRootTileToCurrentTile() { RootTile = CurrentTile; }
+
+	void SetCurrentTileToRootTile() { if (RootTile) CurrentTile = RootTile; }
 
 	virtual ~AChessPiece() = default;
 protected:
@@ -92,6 +96,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* CurrentTile = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	ATile* RootTile = nullptr;
 
 	TArray<ATile*> AllPossibleTiles;
 

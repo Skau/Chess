@@ -7,6 +7,10 @@
 #include "Tile.generated.h"
 
 class AChessPiece;
+class ATile;
+
+typedef AChessPiece* AChessPiecePtr;
+typedef ATile* ATilePtr;
 
 enum class EDirection 
 {
@@ -40,8 +44,6 @@ public:
 
 	void SetDefaultMaterial();
 
-	void SetAllTilesAroundBlue();
-
 	bool GetIfLightMaterial() { return (bIsLightMaterial ? true : false); }
 
 	void SetName(FName NewName) { TileName = NewName; }
@@ -49,11 +51,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FName GetTileName() { return TileName; }
 
-	bool GetHasChessPiece() { return CurrentChessPiece ? true : false; }
+	bool GetHasChessPiece();
 
-	void SetChessPice(AChessPiece* NewChessPiece) { CurrentChessPiece = NewChessPiece; }
+	void SetChessPice(AChessPiecePtr NewChessPiece) { CurrentChessPiece = NewChessPiece; }
 
-	AChessPiece*& GetChessPiece() { return CurrentChessPiece; }
+	AChessPiecePtr& GetChessPiece() { return CurrentChessPiece; }
 
 	void SetIsPossibleMoveLocation(bool Value) { bIsPossibleMoveLocation = Value; }
 
@@ -63,35 +65,39 @@ public:
 	
 	bool GetIsPossibleCaptureLocation() { return bIsPossibleCaptureLocation; }
 
-	FVector GetChessPieceLocation() { UE_LOG(LogTemp, Warning, TEXT("%s"), *ChessPieceLocation.ToString()) return ChessPieceLocation; }
+	TArray<ATilePtr>& GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, class ABoard*& Gameboard);
 
-	TArray<ATile*>& GetAllTilesInADirection(ATile* StartTile, EDirection Direction);
+	void SetTileUp(ATilePtr TileIn) { TileUp = TileIn; }
+	void SetTileDown(ATilePtr TileIn) { TileDown = TileIn; }
+	void SetTileLeft(ATilePtr TileIn) { TileLeft = TileIn; }
+	void SetTileRight(ATilePtr TileIn) { TileRight = TileIn; }
+	void SetTileDiagonalRightUp(ATilePtr TileIn) { TileDiagonalRightUp = TileIn; }
+	void SetTileDiagonalLeftUp(ATilePtr TileIn) { TileDiagonalLeftUp = TileIn; }
+	void SetTileDiagonalRightDown(ATilePtr TileIn) { TileDiagonalRightDown = TileIn; }
+	void SetTileDiagonalLeftDown(ATilePtr TileIn) { TileDiagonalLeftDown = TileIn; }
 
-	ATile* GetSingleTile(ATile* StartTile, EDirection Direction, int NumberOfTilesAway);
-
-	void SetTileUp(ATile* TileIn) { TileUp = TileIn; }
-	void SetTileDown(ATile* TileIn) { TileDown = TileIn; }
-	void SetTileLeft(ATile* TileIn) { TileLeft = TileIn; }
-	void SetTileRight(ATile* TileIn) { TileRight = TileIn; }
-	void SetTileDiagonalRightUp(ATile* TileIn) { TileDiagonalRightUp = TileIn; }
-	void SetTileDiagonalLeftUp(ATile* TileIn) { TileDiagonalLeftUp = TileIn; }
-	void SetTileDiagonalRightDown(ATile* TileIn) { TileDiagonalRightDown = TileIn; }
-	void SetTileDiagonalLeftDown(ATile* TileIn) { TileDiagonalLeftDown = TileIn; }
-
-	ATile*& GetTileUp() { return TileUp; }
-	ATile*& GetTileDown() { return TileDown; }
-	ATile*& GetTileLeft() { return TileLeft; }
-	ATile*& GetTileRight() { return TileRight; }
-	ATile*& GetTileDiagonalRightUp() { return TileDiagonalRightUp; }
-	ATile*& GetTileDiagonalLeftUp() { return TileDiagonalLeftUp; }
-	ATile*& GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
-	ATile*& GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
+	ATilePtr& GetTileUp() { return TileUp; }
+	ATilePtr& GetTileDown() { return TileDown; }
+	ATilePtr& GetTileLeft() { return TileLeft; }
+	ATilePtr& GetTileRight() { return TileRight; }
+	ATilePtr& GetTileDiagonalRightUp() { return TileDiagonalRightUp; }
+	ATilePtr& GetTileDiagonalLeftUp() { return TileDiagonalLeftUp; }
+	ATilePtr& GetTileDiagonalRightDown() { return TileDiagonalRightDown; }
+	ATilePtr& GetTileDiagonalLeftDown() { return TileDiagonalLeftDown; }
 
 	UPROPERTY(VisibleAnywhere)
 	int index = 0;
 
 	UPROPERTY(VisibleAnywhere)
 	FName TileName = "";
+
+	void TempRemoveChessPiece();
+	void TempAddChessPiece(AChessPiece* ChessPiece) { TempAddedChessPiece = ChessPiece; }
+	void ResetTileToCurrentState();
+	void ResetToRootChessPiece();
+	void SetRootPieceFromCurrentChessPiece();
+	void SetCurrentChessPieceToNull() { CurrentChessPiece = nullptr; }
+	void SetRootPieceToNull() { if (CurrentChessPiece != RootChessPiece) RootChessPiece = nullptr; }
 
 private:
 	// Sets default values for this actor's properties
@@ -132,6 +138,13 @@ private:
 	bool bIsPossibleCaptureLocation = false;
 
 	UPROPERTY(VisibleAnywhere)
+	AChessPiece* RootChessPiece = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	AChessPiece* TempRemovedChessPiece = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	AChessPiece* TempAddedChessPiece = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
 	ATile* TileUp = nullptr;
 	UPROPERTY(VisibleAnywhere)
 	ATile* TileDown = nullptr;
@@ -148,5 +161,5 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	ATile* TileDiagonalLeftDown = nullptr;
 
-	TArray<ATile*> AllTilesInADirection;
+	TArray<ATilePtr> AllTilesInADirection;
 };

@@ -170,99 +170,101 @@ void ABoard::SpawnTiles(bool bIsTemp)
 			Tiles.Add(Tile);
 		}
 
-		if (Tiles.Num())
+		UpdateTilePointers();
+	}
+}
+
+void ABoard::UpdateTilePointers()
+{
+	if (Tiles.Num())
+	{
+		for (int i = 0; i < 64; ++i)
 		{
-			for (int i = 0; i < 64; ++i)
+			if (Tiles[i])
 			{
-				if (Tiles[i])
+				if ((i == 7 || i == 15 || i == 23 || i == 31 || i == 39 || i == 47 || i == 55 || i == 63))
 				{
-					// Bottom Tiles
-					if ((i == 7 || i == 15 || i == 23 || i == 31 || i == 39 || i == 47 || i == 55 || i == 63))
+					Tiles[i]->SetTileDown(nullptr);
+					Tiles[i]->SetTileDiagonalLeftDown(nullptr);
+					Tiles[i]->SetTileDiagonalRightDown(nullptr);
+				}
+				else
+				{
+					if (i + 1 >= 0 && i + 1 <= 63)
 					{
-						Tiles[i]->SetTileDown(nullptr);
-						Tiles[i]->SetTileDiagonalLeftDown(nullptr);
-						Tiles[i]->SetTileDiagonalRightDown(nullptr);
-					}
-					else
-					{
-						if (i + 1 >= 0 && i + 1 <= 63)
+						if (Tiles[i + 1])
 						{
-							if (Tiles[i + 1])
-							{
-								Tiles[i]->SetTileDown(Tiles[i + 1]);
-							}
-						}
-
-						if (i + 9 >= 0 && i + 9 <= 63)
-						{
-							if (Tiles[i + 9])
-							{
-								Tiles[i]->SetTileDiagonalLeftDown(Tiles[i + 9]);
-							}
-						}
-
-						if (i - 7 >= 0 && i - 7 <= 63)
-						{
-							if (Tiles[i - 7])
-							{
-								Tiles[i]->SetTileDiagonalRightDown(Tiles[i - 7]);
-							}
+							Tiles[i]->SetTileDown(Tiles[i + 1]);
 						}
 					}
 
-					// Top tiles
-					if ((i == 8 || i == 16 || i == 24 || i == 32 || i == 40 || i == 48 || i == 56 || i == 64))
+					if (i + 9 >= 0 && i + 9 <= 63)
 					{
-						Tiles[i]->SetTileUp(nullptr);
-						Tiles[i]->SetTileDiagonalRightUp(nullptr);
-						Tiles[i]->SetTileDiagonalLeftUp(nullptr);
+						if (Tiles[i + 9])
+						{
+							Tiles[i]->SetTileDiagonalLeftDown(Tiles[i + 9]);
+						}
 					}
-					else
-					{
-						if (i - 1 >= 0 && i - 1 <= 63)
-						{
-							if (Tiles[i - 1])
-							{
-								if (i % 8 == 0)
-								{
-									Tiles[i]->SetTileUp(nullptr);
-								}
-								else
-								{
-									Tiles[i]->SetTileUp(Tiles[i - 1]);
-								}
-							}
-						}
 
-						if (i + 7 >= 0 && i + 7 <= 63)
+					if (i - 7 >= 0 && i - 7 <= 63)
+					{
+						if (Tiles[i - 7])
 						{
-							if (Tiles[i + 7])
-							{
-								Tiles[i]->SetTileDiagonalLeftUp(Tiles[i + 7]);
-							}
+							Tiles[i]->SetTileDiagonalRightDown(Tiles[i - 7]);
 						}
-						if (i - 9 >= 0 && i - 9 <= 63)
+					}
+				}
+				if ((i == 8 || i == 16 || i == 24 || i == 32 || i == 40 || i == 48 || i == 56 || i == 64))
+				{
+					Tiles[i]->SetTileUp(nullptr);
+					Tiles[i]->SetTileDiagonalRightUp(nullptr);
+					Tiles[i]->SetTileDiagonalLeftUp(nullptr);
+				}
+				else
+				{
+					if (i - 1 >= 0 && i - 1 <= 63)
+					{
+						if (Tiles[i - 1])
 						{
-							if (Tiles[i - 9])
+							if (i % 8 == 0)
 							{
-								Tiles[i]->SetTileDiagonalRightUp(Tiles[i - 9]);
+								Tiles[i]->SetTileUp(nullptr);
+							}
+							else
+							{
+								Tiles[i]->SetTileUp(Tiles[i - 1]);
 							}
 						}
 					}
 
-					if (i + 8 >= 0 && i + 8 <= 63)
+					if (i + 7 >= 0 && i + 7 <= 63)
 					{
-						if (Tiles[i + 8])
+						if (Tiles[i + 7])
 						{
-							Tiles[i]->SetTileLeft(Tiles[i + 8]);
+							Tiles[i]->SetTileDiagonalLeftUp(Tiles[i + 7]);
 						}
 					}
-					if (i - 8 >= 0 && i - 8 <= 63)
+					if (i - 9 >= 0 && i - 9 <= 63)
 					{
-						if (Tiles[i - 8])
+						if (Tiles[i - 9])
 						{
-							Tiles[i]->SetTileRight(Tiles[i - 8]);
+							Tiles[i]->SetTileDiagonalRightUp(Tiles[i - 9]);
 						}
+					}
+				}
+
+				if (i + 8 >= 0 && i + 8 <= 63)
+				{
+					if (Tiles[i + 8])
+					{
+						Tiles[i]->SetTileLeft(Tiles[i + 8]);
+					}
+				}
+				if (i - 8 >= 0 && i - 8 <= 63)
+				{
+					if (Tiles[i - 8])
+					{
+						Tiles[i]->SetTileRight(Tiles[i - 8]);
 					}
 				}
 			}
@@ -287,6 +289,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::Rook);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -299,6 +302,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::Knight);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -311,6 +315,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::Bishop);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -323,6 +328,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::Queen);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -335,6 +341,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::King);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -347,6 +354,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetWhiteMaterial();
 				piece->SetPieceType(EPieceType::Pawn);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllWhitePieces.Add(piece);
 			}
@@ -361,6 +369,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::Rook);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -373,6 +382,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::Knight);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -385,6 +395,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::Bishop);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -397,6 +408,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::King);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -409,6 +421,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::Queen);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -421,6 +434,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetBlackMaterial();
 				piece->SetPieceType(EPieceType::Pawn);
 				piece->SetCurrentTile(Tiles[i]);
+				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
 				AllBlackPieces.Add(piece);
 			}
@@ -581,7 +595,29 @@ void ABoard::DestroyBoard()
 	Destroy();
 }
 
-TArray<ATile*>& ABoard::GetAllTilesUp(ATile* StartingTile)
+void ABoard::SaveCurrentChessPieces(bool IsRoot)
+{
+	for (auto& Tile : Tiles)
+	{
+		if (Tile->GetHasChessPiece())
+		{
+			if (IsRoot)
+			{
+				Tile->SetRootPieceFromCurrentChessPiece();
+			}
+		}
+	}
+}
+
+void ABoard::ResetAllChessPiecesToCurrentState()
+{
+	for (auto& Tile : Tiles)
+	{
+		Tile->ResetTileToCurrentState();
+	}
+}
+
+TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -757,7 +793,7 @@ TArray<ATile*>& ABoard::GetAllTilesUp(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDown(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -935,7 +971,7 @@ TArray<ATile*>& ABoard::GetAllTilesDown(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesLeft(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -1112,7 +1148,7 @@ TArray<ATile*>& ABoard::GetAllTilesLeft(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesRight(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesRight(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -1289,7 +1325,7 @@ TArray<ATile*>& ABoard::GetAllTilesRight(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -1466,7 +1502,7 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -1643,7 +1679,7 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
@@ -1820,7 +1856,7 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile* StartingTile)
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile* StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 

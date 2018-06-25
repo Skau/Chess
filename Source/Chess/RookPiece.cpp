@@ -17,23 +17,23 @@ void ARookPiece::BeginPlay()
 	}
 }
 
-TArray<ATile*>& ARookPiece::GetAllPossibleTiles()
+TArray<ATile*>& ARookPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
 	PossibleTilesToMove.Empty();
 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP, Gameboard))
+	{
+		PossibleTilesToMove.Add(Tile);
+	} 
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}

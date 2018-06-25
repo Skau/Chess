@@ -17,39 +17,39 @@ void AQueenPiece::BeginPlay()
 	}
 }
 
-TArray<ATile*>& AQueenPiece::GetAllPossibleTiles()
+TArray<ATile*>& AQueenPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
 	PossibleTilesToMove.Empty();
 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTUP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTUP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTUP))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTUP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN))
+	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);
 	}

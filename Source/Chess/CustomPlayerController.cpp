@@ -293,7 +293,7 @@ void ACustomPlayerController::ResetSelectedChessPieceTiles(AChessPiece* ChessPie
 {
 	if (ChessPiece)
 	{
-		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())
+		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles(GameBoard))
 		{
 			Tile->SetDefaultMaterial();
 		}
@@ -322,7 +322,7 @@ void ACustomPlayerController::UpdateSelectedChessPieceTiles()
 	{
 		CurrentPossibleMoveLocationTiles.Empty();
 
-		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles())
+		for (auto& Tile : CurrentChessPieceClicked->GetAllPossibleTiles(GameBoard))
 		{
 			if (Tile->GetIsPossibleCaptureLocation())
 			{

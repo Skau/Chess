@@ -17,7 +17,7 @@ void AKingPiece::BeginPlay()
 	}
 }
 
-TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
+TArray<ATile*>& AKingPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 {
 	PossibleTilesToMove.Empty();
 
@@ -27,12 +27,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileUp()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileUp()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileUp()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileUp());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileUp()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileUp());
 		}
 	}
@@ -42,12 +44,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileDown()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileDown()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileDown()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileDown());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileDown()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileDown());
 		}
 	}
@@ -57,12 +61,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileLeft()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileLeft()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileLeft());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileLeft()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileLeft());
 		}
 	}
@@ -72,12 +78,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileRight()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileRight()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileRight()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileRight());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileRight()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileRight());
 		}
 	}
@@ -87,12 +95,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightUp());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightUp());
 		}
 	}
@@ -102,12 +112,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightDown());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalRightDown());
 		}
 	}
@@ -117,12 +129,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftUp());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftUp());
 		}
 	}
@@ -132,12 +146,14 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles()
 		{
 			if (CurrentTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != CurrentTile->GetChessPiece()->GetIsWhite())
 			{
+				CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleMoveLocation(true);
 				CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 				PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftDown());
 			}
 		}
 		else
 		{
+			CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleMoveLocation(true);
 			PossibleTilesToMove.Add(CurrentTile->GetTileDiagonalLeftDown());
 		}
 	}

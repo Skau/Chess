@@ -16,7 +16,7 @@ class CHESS_API ARookPiece : public AChessPiece
 
 	void BeginPlay() override;
 	
-	virtual TArray<ATile*>& GetAllPossibleTiles() override;
+	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& Gameboard) override;
 
 	TArray<ATile*> PossibleTilesToMove;
 	

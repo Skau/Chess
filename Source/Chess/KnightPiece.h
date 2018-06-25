@@ -16,7 +16,7 @@ class CHESS_API AKnightPiece : public AChessPiece
 
 	void BeginPlay() override;
 
-	virtual TArray<ATile*>& GetAllPossibleTiles() override;
+	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& GameBoard) override;
 	
 	TArray<ATile*> PossibleTilesToMove;
 	
