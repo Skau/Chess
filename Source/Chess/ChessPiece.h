@@ -47,11 +47,11 @@ public:
 
 	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& Gameboard);
 
-	void MoveToNewTile(ATile*& NewTile);
+	void MoveToNewTile(ATile*& NewTile, class ABoard*& Gameboard);
 
 	void AI_TestMove(ATile*& NewTile, class ABoard*& GameBoard);
 	
-	void AI_UndoTestMove(ATile*& OldTile, class ABoard*& GameBoard, AChessPiece*& CapturedPawn);
+	void AI_UndoTestMove(struct FMove*& Move, class ABoard *& GameBoard);
 
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
@@ -62,9 +62,28 @@ public:
 
 	void SetRootTileToCurrentTile() { RootTile = CurrentTile; }
 
-	void SetCurrentTileToRootTile() { if (RootTile) CurrentTile = RootTile; }
+	void SetCurrentTileToRootTile() { if (RootTile) { CurrentTile = RootTile; } }
+
+	ATile*& GetCurrentRootTile() { return RootTile; }
+
+	ATile*& GetLastTile() { return LastTile; }
+
+	void SetCurrentTileToLastTile() { CurrentTile = LastTile; }
+
+	void SetLastTileToCurrentTile() { LastTile = CurrentTile; }
 
 	virtual ~AChessPiece() = default;
+
+	void SetHasTempFirstMoved() { bHasTempFirstMoved = true; }
+
+	void ResetHasTempFirstMoved() { bHasTempFirstMoved = false; }
+
+	bool GetHasFirstTempMoved() { return bHasTempFirstMoved; }
+
+	bool GetHasFirstMoved() { return bIsFirstMove; }
+
+	void SetFirstMove(bool Value) { bIsFirstMove = Value; }
+
 protected:
 	// Sets default values for this actor's properties
 	AChessPiece();
@@ -100,6 +119,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	ATile* RootTile = nullptr;
 
+	UPROPERTY(VisibleAnywhere)
+	ATile* LastTile = nullptr;
+
 	TArray<ATile*> AllPossibleTiles;
 
 	class AChessGameModeBase* GameMode = nullptr;
@@ -111,4 +133,6 @@ protected:
 	EPieceType Type = EPieceType::None;
 
 	int MaterialValue = 0;
+
+	bool bHasTempFirstMoved = false;
 };

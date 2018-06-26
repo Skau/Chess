@@ -49,7 +49,9 @@ public:
 
 	void SaveCurrentChessPieces(bool IsRoot);
 
-	void ResetAllChessPiecesToCurrentState();
+	void ResetAllChessPiecesToLastState();
+
+	void RootUndo();
 
 private:
 	// Sets default values for this actor's properties

@@ -53,7 +53,7 @@ void ACustomPlayerController::SetupInputComponent()
 
 	if (InputComponent)
 	{
-		InputComponent->BindAction("ToggleSelectObject", IE_Pressed, this, &ACustomPlayerController::OnLeftClick); 
+		InputComponent->BindAction("ToggleSelectObject", IE_Pressed, this, &ACustomPlayerController::OnLeftClick);
 		InputComponent->BindAction("ResetGame", IE_Repeat, this, &ACustomPlayerController::RestartGame);
 	}
 
@@ -123,98 +123,101 @@ void ACustomPlayerController::OnHover()
 
 void ACustomPlayerController::OnLeftClick()
 {
-	if (CursorHitResult.Actor->IsA(AChessPiece::StaticClass()))
+	if (GameBoard)
 	{
-		// If hovering over piece
-		if (CurrentChessPieceHovered)
+		if (CursorHitResult.Actor->IsA(AChessPiece::StaticClass()))
 		{
-			// If already clicked a piece
-			if (CurrentChessPieceClicked != CursorHitResult.Actor)
+			// If hovering over piece
+			if (CurrentChessPieceHovered)
 			{
-				if (!bPieceIsCapturing)
+				// If already clicked a piece
+				if (CurrentChessPieceClicked != CursorHitResult.Actor)
 				{
-					auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
-					if (Piece)
-					{ 
-						if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+					if (!bPieceIsCapturing)
+					{
+						auto Piece = Cast<AChessPiece>(CursorHitResult.Actor);
+						if (Piece)
 						{
-							CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile());
-							ResetSelectedChessPieceTiles(Piece);
-							bPieceIsCapturing = true;
-							GameMode->ToggleTurn();
+							if (Piece->GetCurrentTile()->GetIsPossibleCaptureLocation())
+							{
+								CurrentChessPieceClicked->MoveToNewTile(Piece->GetCurrentTile(), GameBoard);
+								ResetSelectedChessPieceTiles(Piece);
+								bPieceIsCapturing = true;
+								GameMode->ToggleTurn();
+							}
 						}
 					}
 				}
-			}
 
-			// Set new piece
-			if (GameMode->GetIfPlayingAgainstPlayer())
-			{
-				if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
+				// Set new piece
+				if (GameMode->GetIfPlayingAgainstPlayer())
 				{
-					// Resets tiles and deselects piece in case one is already pressed
-					ResetSelectedChessPieceTiles();
-
-					CurrentChessPieceClicked = CurrentChessPieceHovered;
-
-					// Set new blue tiles
-					UpdateSelectedChessPieceTiles();
-
-					if (bPieceIsCapturing)
+					if (CurrentChessPieceHovered->GetIsWhite() == GameMode->GetIsWhiteTurn())
 					{
+						// Resets tiles and deselects piece in case one is already pressed
 						ResetSelectedChessPieceTiles();
 
+						CurrentChessPieceClicked = CurrentChessPieceHovered;
+
+						// Set new blue tiles
 						UpdateSelectedChessPieceTiles();
+
+						if (bPieceIsCapturing)
+						{
+							ResetSelectedChessPieceTiles();
+
+							UpdateSelectedChessPieceTiles();
+						}
 					}
 				}
-			}
-			else
-			{
-				if (GameMode->GetIsWhiteTurn() && CurrentChessPieceHovered->GetIsWhite())
+				else
 				{
-					// Resets tiles and deselects piece in case one is already pressed
-					ResetSelectedChessPieceTiles();
-
-					CurrentChessPieceClicked = CurrentChessPieceHovered;
-
-					// Set new blue tiles
-					UpdateSelectedChessPieceTiles();
-
-					if (bPieceIsCapturing)
+					if (GameMode->GetIsWhiteTurn() && CurrentChessPieceHovered->GetIsWhite())
 					{
+						// Resets tiles and deselects piece in case one is already pressed
 						ResetSelectedChessPieceTiles();
 
+						CurrentChessPieceClicked = CurrentChessPieceHovered;
+
+						// Set new blue tiles
 						UpdateSelectedChessPieceTiles();
+
+						if (bPieceIsCapturing)
+						{
+							ResetSelectedChessPieceTiles();
+
+							UpdateSelectedChessPieceTiles();
+						}
 					}
 				}
 			}
 		}
-	}
-	else if (CursorHitResult.Actor->IsA(ATile::StaticClass()))
-	{
-		if (CurrentHoveredTile)
+		else if (CursorHitResult.Actor->IsA(ATile::StaticClass()))
 		{
-			// If clicking on hovered tile
-			if (CurrentHoveredTile == CursorHitResult.Actor)
+			if (CurrentHoveredTile)
 			{
-				// If a piece is selected
-				if (CurrentChessPieceClicked)
+				// If clicking on hovered tile
+				if (CurrentHoveredTile == CursorHitResult.Actor)
 				{
-					if (CurrentChessPieceClicked->GetIsWhite() == GameMode->GetIsWhiteTurn())
+					// If a piece is selected
+					if (CurrentChessPieceClicked)
 					{
-						if (CurrentHoveredTile->GetIsPossibleCaptureLocation())
+						if (CurrentChessPieceClicked->GetIsWhite() == GameMode->GetIsWhiteTurn())
 						{
-							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
-							GameMode->ToggleTurn();
-						}
-						else if (CurrentHoveredTile->GetIsPossibleMoveLocation())
-						{
-							CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile);
-							GameMode->ToggleTurn();
-						}
-						ResetSelectedChessPieceTiles();
+							if (CurrentHoveredTile->GetIsPossibleCaptureLocation())
+							{
+								CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile, GameBoard);
+								GameMode->ToggleTurn();
+							}
+							else if (CurrentHoveredTile->GetIsPossibleMoveLocation())
+							{
+								CurrentChessPieceClicked->MoveToNewTile(CurrentHoveredTile, GameBoard);
+								GameMode->ToggleTurn();
+							}
+							ResetSelectedChessPieceTiles();
 
-						UpdateSelectedChessPieceTiles();
+							UpdateSelectedChessPieceTiles();
+						}
 					}
 				}
 			}

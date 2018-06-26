@@ -21,6 +21,8 @@ TArray<ATile*>& ARookPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
 	PossibleTilesToMove.Empty();
 
+	if (CurrentTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("Piece: GetAllPossibleTiles: CurrentTile->GetHasChessPiece() NULL ERROR")) return PossibleTilesToMove; }
+
 	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP, Gameboard))
 	{
 		PossibleTilesToMove.Add(Tile);

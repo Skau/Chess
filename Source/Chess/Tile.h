@@ -55,7 +55,10 @@ public:
 
 	void SetChessPice(AChessPiecePtr NewChessPiece) { CurrentChessPiece = NewChessPiece; }
 
-	AChessPiecePtr& GetChessPiece() { return CurrentChessPiece; }
+	AChessPiecePtr& GetChessPiece() {
+		if (CurrentChessPiece) { return CurrentChessPiece; }
+		else { /*UE_LOG(LogTemp, Warning, TEXT("Returning RootChessPiece instead"))*/ return RootChessPiece; }
+	}
 
 	void SetIsPossibleMoveLocation(bool Value) { bIsPossibleMoveLocation = Value; }
 
@@ -91,13 +94,37 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	FName TileName = "";
 
-	void TempRemoveChessPiece();
+	//void SetTempCurrentChessPiece(AChessPiece* ChessPiece) { TempCurrentChessPiece = ChessPiece; }
 	void TempAddChessPiece(AChessPiece* ChessPiece) { TempAddedChessPiece = ChessPiece; }
-	void ResetTileToCurrentState();
-	void ResetToRootChessPiece();
-	void SetRootPieceFromCurrentChessPiece();
+	void SetTempCapturedChessPiece(AChessPiece* ChessPiece) { TempCapturedChessPiece = ChessPiece; }
+	void SetTempLastChessPiece(AChessPiece* ChessPiece) { TempLastChessPiece = ChessPiece; }
+	void TempRemoveChessPiece(AChessPiece* ChessPiece) { TempRemovedChessPiece = ChessPiece; }
+
+	AChessPiece*& GetTempAddedChessPiece() { return TempAddedChessPiece; }
+	AChessPiece*& GetTempRemovedChessPiece() { return TempRemovedChessPiece; }
+	AChessPiece*& GetRootChessPiece() { return RootChessPiece; }
+	AChessPiece*& GetTempCapturedChessPiece() { return TempCapturedChessPiece; }
+	AChessPiece*& GetTempLastChessPiece() { return TempLastChessPiece; }
+	//AChessPiece*& GetTempCurrentChessPiece() { return TempCurrentChessPiece; }
+
 	void SetCurrentChessPieceToNull() { CurrentChessPiece = nullptr; }
-	void SetRootPieceToNull() { if (CurrentChessPiece != RootChessPiece) RootChessPiece = nullptr; }
+	//void SetTempCurrentChessPiece() { TempCurrentChessPiece = nullptr; }
+	// Sets the root piece to null
+	void SetRootPieceToNull() { RootChessPiece = nullptr; }
+
+	// Undos last move on the tile
+	void ResetTileToLastState();
+	// Reset back to complete root state
+	void ResetToRootChessPiece();
+	// Set current chess piece as root chess piece
+	void SetRootPieceFromCurrentChessPiece();
+	// Null all piece pointers
+	void SetAllChessPiecePointersToNull();
+
+	void SetAIMovedFromThisTile(bool Value) { bAIMovedFromThisTile = Value; }
+	bool GetAIMovedFromThisTile() { return bAIMovedFromThisTile; }
+	void SetAIMovedToThisTile(bool Value) { bAIMovedToThisTile = Value; }
+	bool GetAIMovedToThisTile() { return bAIMovedToThisTile; }
 
 private:
 	// Sets default values for this actor's properties
@@ -128,21 +155,34 @@ private:
 	bool bIsLightMaterial = false;
 	bool bIsDarkMaterial = false;
 
-	UPROPERTY(VisibleAnywhere)
-	AChessPiece* CurrentChessPiece = nullptr;
-
 	FVector ChessPieceLocation = FVector(GetActorLocation().X, GetActorLocation().Y, 20);
 
+	UPROPERTY(VisibleAnywhere)
 	bool bIsPossibleMoveLocation = false;
 
+	UPROPERTY(VisibleAnywhere)
 	bool bIsPossibleCaptureLocation = false;
+
+	bool bAIMovedFromThisTile = false;
+
+	bool bAIMovedToThisTile = false;
+
+	bool bAICapturedThisTile = false;
 
 	UPROPERTY(VisibleAnywhere)
 	AChessPiece* RootChessPiece = nullptr;
 	UPROPERTY(VisibleAnywhere)
+	AChessPiece* CurrentChessPiece = nullptr;
+	//UPROPERTY(VisibleAnywhere)
+	//AChessPiece* TempCurrentChessPiece = nullptr;
+	UPROPERTY(VisibleAnywhere)
 	AChessPiece* TempRemovedChessPiece = nullptr;
 	UPROPERTY(VisibleAnywhere)
 	AChessPiece* TempAddedChessPiece = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	AChessPiece* TempCapturedChessPiece = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	AChessPiece* TempLastChessPiece = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* TileUp = nullptr;

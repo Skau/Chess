@@ -55,41 +55,113 @@ TArray<ATile*>& AChessPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 	return AllPossibleTiles;
 }
 
-void AChessPiece::MoveToNewTile(ATile*& NewTile)
+void AChessPiece::MoveToNewTile(ATile*& NewTile, ABoard*& Gameboard)
 {
 	if (!NewTile || !CurrentTile) {return; }
 
+	// Check to see if we can move here
 	if (NewTile->GetIsPossibleMoveLocation())
 	{
+		// Check to see if we can capture a piece here
 		if (NewTile->GetIsPossibleCaptureLocation())
 		{
-			if (GameMode)
+			if (GameMode && NewTile->GetHasChessPiece())
 			{
 				GameMode->GetGameBoard()->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
 			}
-			NewTile->GetChessPiece()->Destroy();
+			//if (NewTile->GetRootChessPiece())
+			//{
+			//	UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: NewTile->RootChessPiece: %s:"), *NewTile->GetRootChessPiece()->GetName())
+			//}
+			//if (NewTile->GetTempAddedChessPiece())
+			//{
+			//	UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: NewTile->TempAddedChessPiece: %s:"), *NewTile->GetTempAddedChessPiece()->GetName())
+			//}
+			//if (NewTile->GetTempCapturedChessPiece())
+			//{
+			//	UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: NewTile->TempCapturedChessPiece: %s:"), *NewTile->GetTempCapturedChessPiece()->GetName())
+			//}
+			//if (NewTile->GetTempRemovedChessPiece())
+			//{
+			//	UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: NewTile->TempRemovedChessPiece: %s:"), *NewTile->GetTempRemovedChessPiece()->GetName())
+			//}
+
+			// If the tile has a chesspiece, destroy it
+			if (NewTile->GetChessPiece())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("MoveToNewTile: Is capturing, %s(this = %s) is capturing %s!"), *CurrentTile->GetChessPiece()->GetName(), *GetName(), *NewTile->GetChessPiece()->GetName())
+				NewTile->GetChessPiece()->Destroy();
+			}
+			// If not chesspiece ptr found, check the rootpiece
+			else
+			{
+				// If rootpiece found, destroy that one
+				UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: %s is capturing at %s, no chesspiece to destroy! (NULL ERROR)"), *GetName(), *NewTile->GetTileName().ToString())
+				if (NewTile->GetRootChessPiece())
+				{
+					UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: Found NewTile->RootChessPiece: %s. Destroying that one instead"), *NewTile->GetRootChessPiece()->GetName())
+					NewTile->GetRootChessPiece()->Destroy();
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: %s did not find NewTile->RootChessPiece to destroy instead! (NULL ERROR)"), *GetName())
+				}
+			}
 		}
 
-		UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: Moving %s to %s:"), *GetName(), *NewTile->GetTileName().ToString())
+		UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: Moving %s from %s to %s:"), *GetName(), *CurrentTile->GetTileName().ToString(), *NewTile->GetTileName().ToString())
 
+		// If AI Moved
+		if (!bIsWhite)
+		{
+			CurrentTile->SetAIMovedFromThisTile(true);
+		}
+		else
+		{
+			LastTile = nullptr;
+		}
+
+		CurrentTile->SetTempLastChessPiece(CurrentTile->GetChessPiece());
+
+		// Set current tile chess piece to null
 		CurrentTile->SetChessPice(nullptr);
 
+		// Set the root piece of current tile to null
 		CurrentTile->SetRootPieceToNull();
 
+		// Set the current tile to be the new one
 		CurrentTile = NewTile;
 
+		// if AI moved
+		if (!bIsWhite)
+		{
+			CurrentTile->SetAIMovedToThisTile(true);
+		}
+
+		// Set the root tile of this to current tile
 		RootTile = CurrentTile;
 
+		// Set the current piece on current tile to this
+		CurrentTile->SetChessPice(this);
+
+		// Set the root piece on current tile to this
 		CurrentTile->SetRootPieceFromCurrentChessPiece();
 
+		// Physically move this to the new tile
 		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
 
-		CurrentTile->SetChessPice(this);
 		if (bIsFirstMove)
 		{
 			bIsFirstMove = false;
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("MoveToNewTile: Current move is not possible!"))
+		UE_LOG(LogTemp, Warning, TEXT("Wanted to move %s from %s to %s"), *GetName(), *CurrentTile->GetTileName().ToString(), *NewTile->GetTileName().ToString())
+	}
+
+	Gameboard->RootUndo();
 }
 
 void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
@@ -113,24 +185,29 @@ void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 			// Get the chesspiece to capture
 			if (NewTile->GetChessPiece())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Capturing %s %s to %s:"), *OtherColor, *NewTile->GetChessPiece()->GetName(), *NewTile->GetTileName().ToString())
+				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Capturing %s %s on %s:"), *OtherColor, *NewTile->GetChessPiece()->GetName(), *NewTile->GetTileName().ToString())
 
 				//GameBoard->UpdateChessPiecesLeft(NewTile->GetChessPiece(), NewTile->GetChessPiece()->GetIsWhite());
 
 				// Add the captured piece to the tile TempRemovePointer
-				NewTile->TempRemoveChessPiece();
+				NewTile->SetTempCapturedChessPiece(NewTile->GetChessPiece());
 
 				// "Remove" the piece
-				NewTile->SetChessPice(nullptr);
+				NewTile->SetCurrentChessPieceToNull();
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Moving %s %s to %s:"), *Color, *GetName(), *NewTile->GetTileName().ToString())
+			UE_LOG(LogTemp, Warning, TEXT("AI_TestMove: Moving %s %s from %s to %s:"), *Color, *GetName(), *CurrentTile->GetTileName().ToString(), *NewTile->GetTileName().ToString())
+			// Set current chesspiece to the removed one
+			CurrentTile->TempRemoveChessPiece(this);
 		}
 
 		// "Remove" current piece from current tile
-		CurrentTile->SetChessPice(nullptr);
+		CurrentTile->SetCurrentChessPieceToNull();
+
+		// Set current tile to last tile
+		SetLastTileToCurrentTile();
 
 		// Set the new tile to be the current one
 		CurrentTile = NewTile;
@@ -138,41 +215,81 @@ void AChessPiece::AI_TestMove(ATile *& NewTile, ABoard*& GameBoard)
 		// Set TempAddedChessPiece on new current tile
 		CurrentTile->TempAddChessPiece(this);
 
-		//SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
-
 		// Set the current tile's chesspiece to this one
 		CurrentTile->SetChessPice(this);
-		
+
+		CurrentTile->SetTempLastChessPiece(CurrentTile->GetChessPiece());
+
 		if (bIsFirstMove)
 		{
-			bIsFirstMove = false;
+			bHasTempFirstMoved = true;
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Lol"))
+		UE_LOG(LogTemp, Error, TEXT("AI_TestMove: Current move is not possible!"))
+		if(CurrentTile && NewTile)
+		UE_LOG(LogTemp, Warning, TEXT("Wanted to move %s %s from %s to %s"), *Color, *GetName(), *CurrentTile->GetTileName().ToString(), *NewTile->GetTileName().ToString())
+
 	}
 }
 
-void AChessPiece::AI_UndoTestMove(ATile*& OldTile, ABoard *& GameBoard, AChessPiece*& CapturedPawn)
+void AChessPiece::AI_UndoTestMove(FMove*& Move, ABoard *& GameBoard)
 {
-	if (!OldTile || !CurrentTile) { return; }
+	if (!Move || !CurrentTile || !GameBoard) { UE_LOG(LogTemp, Warning, TEXT("AI_UndoTestMove: NULL ERROR")) return; }
+	
+	//** Current tile is the temp moved to **//
 
-	if (OldTile->GetIsPossibleMoveLocation())
+	// Set chesspiece to lasttile and reset current tile
+	if (LastTile)
 	{
-		if (OldTile->GetIsPossibleCaptureLocation())
-		{
-			GameBoard->UpdateChessPiecesLeft(OldTile->GetChessPiece(), OldTile->GetChessPiece()->GetIsWhite());
-
-			OldTile->GetChessPiece()->Destroy();
-		}
-		CurrentTile->SetChessPice(nullptr);
-
-		CurrentTile = OldTile;
-
-		SetActorLocation(FVector(CurrentTile->GetActorLocation().X, CurrentTile->GetActorLocation().Y, 20));
-
+		//CurrentTile->SetChessPice(nullptr);
+		CurrentTile = LastTile;
 		CurrentTile->SetChessPice(this);
+		LastTile->SetChessPice(nullptr);
+		LastTile = nullptr;
+
+		if (bHasTempFirstMoved)
+		{
+			bHasTempFirstMoved = false;
+			bIsFirstMove = true;
+		}
+	}
+
+	// If a piece was captured, put it back
+	if (Move->PossibleTileToMove->GetTempCapturedChessPiece())
+	{
+		Move->PossibleTileToMove->SetChessPice(Move->PossibleTileToMove->GetTempCapturedChessPiece());
+		Move->PossibleTileToMove->GetChessPiece()->SetCurrentTile(Move->PossibleTileToMove);
+	}
+	else
+	{
+		//Move->PossibleTileToMove->SetChessPice(nullptr);
+		//Move->PossibleTileToMove->SetAllChessPiecePointersToNull();
+	}
+
+	// If any new piece was moved here, remove the piece
+	if (Move->PossibleTileToMove->GetTempAddedChessPiece())
+	{
+		Move->PossibleTileToMove->SetCurrentChessPieceToNull();
+		Move->PossibleTileToMove->TempAddChessPiece(nullptr);
+	}
+
+	// If a piece was captured here, put the captured piece back
+	if (Move->PossibleTileToMove->GetTempCapturedChessPiece())
+	{
+		Move->PossibleTileToMove->SetChessPice(Move->PossibleTileToMove->GetTempCapturedChessPiece());
+		Move->PossibleTileToMove->SetTempCapturedChessPiece(nullptr);
+	}
+
+	// If any piece moved away from here, put it back
+	if (Move->PossibleTileToMove->GetTempRemovedChessPiece())
+	{
+		if (Move->PossibleTileToMove->GetTempRemovedChessPiece() != Move->PossibleTileToMove->GetChessPiece())
+		{
+			Move->PossibleTileToMove->SetChessPice(Move->PossibleTileToMove->GetTempRemovedChessPiece());
+		}
+		Move->PossibleTileToMove->TempRemoveChessPiece(nullptr);
 	}
 }
 

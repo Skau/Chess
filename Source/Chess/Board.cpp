@@ -291,6 +291,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 
@@ -304,6 +305,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 
@@ -317,6 +319,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 
@@ -330,6 +333,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 
@@ -343,6 +347,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 
@@ -356,6 +361,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllWhitePieces.Add(piece);
 			}
 		}
@@ -371,6 +377,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 
@@ -384,6 +391,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 
@@ -397,6 +405,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 
@@ -410,6 +419,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 
@@ -423,6 +433,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 
@@ -436,6 +447,7 @@ void ABoard::SpawnChessPieces()
 				piece->SetCurrentTile(Tiles[i]);
 				piece->SetRootTileToCurrentTile();
 				Tiles[i]->SetChessPice(piece);
+				Tiles[i]->SetRootPieceFromCurrentChessPiece();
 				AllBlackPieces.Add(piece);
 			}
 		}
@@ -609,17 +621,74 @@ void ABoard::SaveCurrentChessPieces(bool IsRoot)
 	}
 }
 
-void ABoard::ResetAllChessPiecesToCurrentState()
+void ABoard::ResetAllChessPiecesToLastState()
 {
 	for (auto& Tile : Tiles)
 	{
-		Tile->ResetTileToCurrentState();
+		Tile->ResetTileToLastState();
+	}
+}
+
+void ABoard::RootUndo()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Root undo"))
+
+	// For all tiles on the board
+	for (auto& Tile : Tiles)
+	{
+		Tile->SetCurrentChessPieceToNull();
+
+		// Reset Tile color and capture/move flags
+		Tile->SetDefaultMaterial();
+
+		// Set the root piece to be the current one
+		Tile->ResetToRootChessPiece();
+
+		// If there is a piece on the tile
+		if (Tile->GetHasChessPiece())
+		{
+			// if the current root tile is not the current tile
+			if (Tile->GetChessPiece()->GetCurrentTile() != Tile)
+			{
+				//if (Tile->GetChessPiece()->GetCurrentRootTile() != Tile->GetChessPiece()->GetCurrentTile())
+				//{
+					// Set the root tile to be the current tile
+					//Tile->GetChessPiece()->SetCurrentTile(Tile);
+					//Tile->GetChessPiece()->SetRootTileToCurrentTile();
+					//Tile->SetChessPice(nullptr);
+					//Tile->SetRootPieceToNull();
+				//}
+			}
+
+			// If AI Moved away from this tile, reset all pointers.
+			if (Tile->GetAIMovedFromThisTile())
+			{
+				Tile->SetAllChessPiecePointersToNull();
+				Tile->SetAIMovedFromThisTile(false);
+			}
+
+			// If AI Moved to this tile, root piece equals current piece
+			if (Tile->GetAIMovedToThisTile())
+			{
+				Tile->SetRootPieceFromCurrentChessPiece();
+				Tile->SetAIMovedToThisTile(false);
+			}
+			//Tile->GetChessPiece()->SetCurrentTileToRootTile();
+		}
+		// If no piece on tile, set all pointers to null
+		else
+		{
+			//???
+			//Tile->SetAllChessPiecePointersToNull();
+		}
 	}
 }
 
 TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
+
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileUp())
 	{
@@ -796,6 +865,8 @@ TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile)
 TArray<ATile*>& ABoard::GetAllTilesDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
+
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDown())
 	{
@@ -975,6 +1046,8 @@ TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
 	if (StartingTile->GetTileLeft())
 	{
 		if (!StartingTile->GetTileLeft()->GetHasChessPiece())
@@ -1151,6 +1224,8 @@ TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile)
 TArray<ATile*>& ABoard::GetAllTilesRight(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
+
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileRight())
 	{
@@ -1329,6 +1404,8 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
 	if (StartingTile->GetTileDiagonalRightUp())
 	{
 		if (!StartingTile->GetTileDiagonalRightUp()->GetHasChessPiece())
@@ -1505,6 +1582,8 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile)
 TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
+
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDiagonalRightDown())
 	{
@@ -1683,6 +1762,8 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
 
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
 	if (StartingTile->GetTileDiagonalLeftUp())
 	{
 		if (!StartingTile->GetTileDiagonalLeftUp()->GetHasChessPiece())
@@ -1859,6 +1940,8 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile)
 TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile*& StartingTile)
 {
 	TilesToReturn.Empty();
+
+	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDiagonalLeftDown())
 	{

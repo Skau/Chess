@@ -21,6 +21,8 @@ TArray<ATile*>& AKingPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 {
 	PossibleTilesToMove.Empty();
 
+	if (CurrentTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("Piece: GetAllPossibleTiles: CurrentTile->GetHasChessPiece() NULL ERROR")) return PossibleTilesToMove; }
+
 	if (CurrentTile->GetTileUp())
 	{
 		if (CurrentTile->GetTileUp()->GetHasChessPiece())

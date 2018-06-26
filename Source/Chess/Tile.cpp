@@ -25,7 +25,6 @@ ATile::ATile()
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -105,6 +104,11 @@ bool ATile::GetHasChessPiece()
 
 	if (CurrentChessPiece)
 	{
+		Bool = true;
+	}
+	else if (RootChessPiece)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RootChessPiece = true!"))
 		Bool = true;
 	}
 
@@ -195,85 +199,39 @@ TArray<ATilePtr>& ATile::GetAllTilesInADirection(ATilePtr& StartTile, EDirection
 	return AllTilesInADirection;
 }
 
-void ATile::TempRemoveChessPiece()
+// Undos last move on the tile
+void ATile::ResetTileToLastState()
 {
-	if (CurrentChessPiece)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TempRemoveChessPiece: %s gets set to TempRemovedChessPiece"), *CurrentChessPiece->GetName())
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TempRemoveChessPiece: CurrentChessPiece == nullptr! "))
-	}
-
-	TempRemovedChessPiece = CurrentChessPiece;
-}
-
-void ATile::ResetTileToCurrentState()
-{
-	if (TempRemovedChessPiece)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece is valid"))
-			if (CurrentChessPiece)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece = %s"), *CurrentChessPiece->GetName())
-			}
-
-		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece(%s) gets set to CurrentChessPiece"), *TempRemovedChessPiece->GetName())
-			CurrentChessPiece = TempRemovedChessPiece;
-		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempRemovedChessPiece = nullptr"))
-			TempRemovedChessPiece = nullptr;
-	}
-
+	// If any new piece was moved here, remove the piece
 	if (TempAddedChessPiece)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: TempAddedChessPiece is valid, setting to nullptr"))
-			if (CurrentChessPiece)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece is valid, setting to nullptr"))
-					CurrentChessPiece = nullptr;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ResetTileToRootState: CurrentChessPiece == nullptr! "))
-			}
+		CurrentChessPiece = nullptr;
 		TempAddedChessPiece = nullptr;
 	}
+
+	// If a piece was captured here, put the captured piece back
+	if (TempCapturedChessPiece)
+	{
+		CurrentChessPiece = TempCapturedChessPiece;
+		TempCapturedChessPiece = nullptr;
+	}
+
+	// If any piece moved away from here, put it back
+	if (TempRemovedChessPiece)
+	{
+		if (TempRemovedChessPiece != CurrentChessPiece)
+		{
+			CurrentChessPiece = TempRemovedChessPiece;
+		}
+		TempRemovedChessPiece = nullptr;
+	}
+
 }
 
+// Reset back to complete root state
 void ATile::ResetToRootChessPiece()
 {
-	if (RootChessPiece)
-	{
-		if (CurrentChessPiece)
-		{
-			if (RootChessPiece != CurrentChessPiece)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece is not equal to CurrentChessPiece! "))
-				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece(%s) gets set to CurrentChessPiece(currently %s)"), *RootChessPiece->GetName(), *CurrentChessPiece->GetName())
-				CurrentChessPiece = RootChessPiece;
-				RootChessPiece = nullptr;
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece is equal to CurrentChessPiece! "))
-				RootChessPiece = nullptr;
-			}
-
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: CurrentChessPiece(NULL) gets set to RootChessPiece(%s)"), *RootChessPiece->GetName())
-			CurrentChessPiece = RootChessPiece;
-			RootChessPiece = nullptr;
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: RootChessPiece == nullptr!"))
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("ResetToRootChessPiece: Nulling other pointers if they are valid"))
+	// null all pointers and set the root piece as current piece
 
 	if (TempAddedChessPiece)
 	{
@@ -284,12 +242,28 @@ void ATile::ResetToRootChessPiece()
 	{
 		TempRemovedChessPiece = nullptr;
 	}
+
+	if (TempCapturedChessPiece)
+	{
+		TempCapturedChessPiece = nullptr;
+	}
+
+	CurrentChessPiece = RootChessPiece;
+	//RootChessPiece = CurrentChessPiece;
 }
 
+// Set current chess piece as root chess piece
 void ATile::SetRootPieceFromCurrentChessPiece()
 {
-	if (CurrentChessPiece)
-	{
-		RootChessPiece = CurrentChessPiece;
-	}
+	RootChessPiece = CurrentChessPiece;
+}
+
+// Null all piece pointers
+void ATile::SetAllChessPiecePointersToNull()
+{
+	CurrentChessPiece = nullptr;
+	RootChessPiece = nullptr;
+	TempAddedChessPiece = nullptr;
+	TempRemovedChessPiece = nullptr;
+	TempCapturedChessPiece = nullptr;
 }

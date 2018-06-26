@@ -35,6 +35,8 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 {
 	AllPossibleTiles.Empty();
 
+	if (CurrentTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("Piece: GetAllPossibleTiles: CurrentTile->GetHasChessPiece() NULL ERROR")) return AllPossibleTiles; }
+
 	if (bIsWhite)
 	{
 		if (CurrentTile->GetTileLeft())
