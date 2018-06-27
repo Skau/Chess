@@ -74,7 +74,7 @@ private:
 
 	int EvaluateBoard(ABoard*& GameBoard);
 
-	void Undo(FMove*& Move, ABoard*& Gameboard);
+	void Undo(FMove*& Move, ABoard*& Gameboard, bool IsLastRegularUndo);
 
 	int TotalNumberOfBoardEvaluates = 0;
 

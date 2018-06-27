@@ -106,11 +106,11 @@ bool ATile::GetHasChessPiece()
 	{
 		Bool = true;
 	}
-	else if (RootChessPiece)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RootChessPiece = true!"))
-		Bool = true;
-	}
+	//else if (RootChessPiece)
+	//{
+	//	/*UE_LOG(LogTemp, Warning, TEXT("RootChessPiece = true!"))*/
+	//	Bool = true;
+	//}
 
 	return Bool;
 }

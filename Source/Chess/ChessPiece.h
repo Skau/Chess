@@ -51,7 +51,7 @@ public:
 
 	void AI_TestMove(ATile*& NewTile, class ABoard*& GameBoard);
 	
-	void AI_UndoTestMove(struct FMove*& Move, class ABoard *& GameBoard);
+	void AI_UndoTestMove(struct FMove*& Move, class ABoard *& GameBoard, bool IsLastRegularUndo);
 
 	void SetPieceType(EPieceType PieceType) { Type = PieceType; }
 
@@ -115,6 +115,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* CurrentTile = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<ATile*> LastTiles;
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* RootTile = nullptr;

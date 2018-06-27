@@ -636,7 +636,7 @@ void ABoard::RootUndo()
 	// For all tiles on the board
 	for (auto& Tile : Tiles)
 	{
-		Tile->SetCurrentChessPieceToNull();
+		//Tile->SetCurrentChessPieceToNull();
 
 		// Reset Tile color and capture/move flags
 		Tile->SetDefaultMaterial();
@@ -648,18 +648,17 @@ void ABoard::RootUndo()
 		if (Tile->GetHasChessPiece())
 		{
 			// if the current root tile is not the current tile
-			if (Tile->GetChessPiece()->GetCurrentTile() != Tile)
+			if (Tile->GetChessPiece()->GetCurrentTile())
 			{
-				//if (Tile->GetChessPiece()->GetCurrentRootTile() != Tile->GetChessPiece()->GetCurrentTile())
-				//{
-					// Set the root tile to be the current tile
-					//Tile->GetChessPiece()->SetCurrentTile(Tile);
-					//Tile->GetChessPiece()->SetRootTileToCurrentTile();
-					//Tile->SetChessPice(nullptr);
-					//Tile->SetRootPieceToNull();
-				//}
+				if (Tile->GetChessPiece()->GetCurrentRootTile())
+				{
+					if (Tile->GetChessPiece()->GetCurrentTile() != Tile->GetChessPiece()->GetCurrentRootTile())
+					{
+						Tile->GetChessPiece()->SetCurrentTile(Tile->GetChessPiece()->GetCurrentRootTile());
+					}
+				}
 			}
-
+			
 			// If AI Moved away from this tile, reset all pointers.
 			if (Tile->GetAIMovedFromThisTile())
 			{
