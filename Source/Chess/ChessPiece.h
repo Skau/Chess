@@ -66,11 +66,15 @@ public:
 
 	ATile*& GetCurrentRootTile() { return RootTile; }
 
-	ATile*& GetLastTile() { return LastTile; }
+	ATile*& GetLastTile() { return LastTiles.Last(); }
 
-	void SetCurrentTileToLastTile() { CurrentTile = LastTile; }
+	TArray<ATile*>& GetAllLastTiles() { return LastTiles; }
 
-	void SetLastTileToCurrentTile() { LastTile = CurrentTile; }
+	void EmptyAllLastTiles() { LastTiles.Empty(); }
+
+	void SetCurrentTileToLastTile() { if (LastTiles.Num())CurrentTile = LastTiles.Pop(); }
+
+	void SetLastTileToCurrentTile() { LastTiles.Push(CurrentTile); }
 
 	virtual ~AChessPiece() = default;
 
@@ -83,6 +87,8 @@ public:
 	bool GetHasFirstMoved() { return bIsFirstMove; }
 
 	void SetFirstMove(bool Value) { bIsFirstMove = Value; }
+
+	void FixTilesAtEndOfRound();
 
 protected:
 	// Sets default values for this actor's properties

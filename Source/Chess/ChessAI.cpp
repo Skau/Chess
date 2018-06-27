@@ -75,7 +75,9 @@ FMove* AChessAI::MiniMaxRoot(ABoard *& Gameboard, int depth, bool IsMaximisingPl
 
 
 	auto RootMoves = FindAllPossibleMoves(Gameboard, !IsMaximisingPlayer);
+
 	UE_LOG(LogTemp, Warning, TEXT("MINIMAXROOT: RootMoves.Num(): %i"), RootMoves.Num())
+
 	FString Color = "white";
 	FString OtherColor = "black";
 	if (!RootMoves[0]->ChessPiece->GetIsWhite())
@@ -97,13 +99,13 @@ FMove* AChessAI::MiniMaxRoot(ABoard *& Gameboard, int depth, bool IsMaximisingPl
 
 	//for (int i = 0; i < RootMoves.Num(); ++i)
 	//{
-		//FString Color = "white";
-		//FString OtherColor = "black";
-		//if (!RootMoves[i]->ChessPiece->GetIsWhite())
-		//{
-		//	Color = "black";
-		//	OtherColor = "white";
-		//}
+	//	FString Color = "white";
+	//	FString OtherColor = "black";
+	//	if (!RootMoves[i]->ChessPiece->GetIsWhite())
+	//	{
+	//		Color = "black";
+	//		OtherColor = "white";
+	//	}
 	//	UE_LOG(LogTemp, Warning, TEXT("AI_TestMove(MiniMaxRoot): %s %s on %s (Test tile: %s)"),
 	//		*Color, *RootMoves[i]->ChessPiece->GetName(), *RootMoves[i]->ChessPiece->GetCurrentTile()->GetTileName().ToString(), *RootMoves[i]->PossibleTileToMove->GetTileName().ToString())
 
@@ -111,13 +113,18 @@ FMove* AChessAI::MiniMaxRoot(ABoard *& Gameboard, int depth, bool IsMaximisingPl
 	//	
 	//	int Value = Minimax(Gameboard, depth - 1, -10000, 10000, !IsMaximisingPlayer);
 
-	//	//if (i < RootMoves.Num()-2)
-	//	//Gameboard->RootUndo();
+	//	if (i < RootMoves.Num() - 2)
+	//	{
+	//		Gameboard->RootUndo();
+	//	}
 
-	//	if (i < RootMoves.Num()-1)
-	//	Undo(RootMoves[i], Gameboard);
+	//	if (i == RootMoves.Num() - 2)
+	//		Undo(RootMoves[i], Gameboard, true);
+	//	else /*(i < RootMoves.Num() - 2)*/
+	//		Undo(RootMoves[i], Gameboard, false);
 
-	//	if (Value >/*=*/ BestMove)
+
+	//	if (Value >/*=*/ BestMove)  
 	//	{
 	//		BestMove = Value;
 	//		MoveToReturn = RootMoves[i];
@@ -156,65 +163,70 @@ int AChessAI::Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool I
 		
 		Undo(RootMoves[0], Gameboard, false);
 		return 0;
-		//if (IsMaximisingPlayer)
-		//{
-		//	int BestMove = -9999;
-		//	for (int i = 0; i < RootMoves.Num(); ++i)
-		//	{
-		//		FString Color = "white";
-		//		FString OtherColor = "black";
-		//		if (!RootMoves[i]->ChessPiece->GetIsWhite())
-		//		{
-		//			Color = "black";
-		//			OtherColor = "white";
-		//		}
-		//		UE_LOG(LogTemp, Warning, TEXT("AI_TestMove(MINIMAX(%i): %s %s on %s (Test tile: %s)"),
-		//			depth, *Color, *RootMoves[i]->ChessPiece->GetName(), *RootMoves[i]->ChessPiece->GetCurrentTile()->GetTileName().ToString(), *RootMoves[i]->PossibleTileToMove->GetTileName().ToString())
-		//		RootMoves[i]->ChessPiece->AI_TestMove(RootMoves[i]->PossibleTileToMove, Gameboard);
 
-		//		BestMove = FMath::Max(BestMove, Minimax(Gameboard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
+		/*if (IsMaximisingPlayer)
+		{
+			int BestMove = -9999;
+			for (int i = 0; i < RootMoves.Num(); ++i)
+			{
+				FString Color = "white";
+				FString OtherColor = "black";
+				if (!RootMoves[i]->ChessPiece->GetIsWhite())
+				{
+					Color = "black";
+					OtherColor = "white";
+				}
+				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove(MINIMAX(%i): %s %s on %s (Test tile: %s)"),
+					depth, *Color, *RootMoves[i]->ChessPiece->GetName(), *RootMoves[i]->ChessPiece->GetCurrentTile()->GetTileName().ToString(), *RootMoves[i]->PossibleTileToMove->GetTileName().ToString())
+				RootMoves[i]->ChessPiece->AI_TestMove(RootMoves[i]->PossibleTileToMove, Gameboard);
 
-		//		if (i < RootMoves.Num() - 1)
-		//		Undo(RootMoves[i], Gameboard);
+				BestMove = FMath::Max(BestMove, Minimax(Gameboard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
 
-		//		Alpha = FMath::Max(Alpha, BestMove);
-		//		if (Beta <= Alpha)
-		//		{
-		//			return BestMove;
-		//		}
-		//	}
-		//	return BestMove;
-		//}
-		//else
-		//{
-		//	int BestMove = 9999;
-		//	for (int i = 0; i < RootMoves.Num(); ++i)
-		//	{
-		//		FString Color = "white";
-		//		FString OtherColor = "black";
-		//		if (!RootMoves[i]->ChessPiece->GetIsWhite())
-		//		{
-		//			Color = "black";
-		//			OtherColor = "white";
-		//		}
-		//		UE_LOG(LogTemp, Warning, TEXT("AI_TestMove(MINIMAX(%i): %s %s on %s (Test tile: %s)"),
-		//			depth, *Color, *RootMoves[i]->ChessPiece->GetName(), *RootMoves[i]->ChessPiece->GetCurrentTile()->GetTileName().ToString(), *RootMoves[i]->PossibleTileToMove->GetTileName().ToString())
-		//		RootMoves[i]->ChessPiece->AI_TestMove(RootMoves[i]->PossibleTileToMove, Gameboard);
+				if (i < RootMoves.Num() - 1)
+					Undo(RootMoves[i], Gameboard, false);
+				else if (i == RootMoves.Num()-1)
+					Undo(RootMoves[i], Gameboard, true);
 
-		//		BestMove = FMath::Min(BestMove, Minimax(Gameboard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
+				Alpha = FMath::Max(Alpha, BestMove);
+				if (Beta <= Alpha)
+				{
+					return BestMove;
+				}
+			}
+			return BestMove;
+		}
+		else
+		{
+			int BestMove = 9999;
+			for (int i = 0; i < RootMoves.Num(); ++i)
+			{
+				FString Color = "white";
+				FString OtherColor = "black";
+				if (!RootMoves[i]->ChessPiece->GetIsWhite())
+				{
+					Color = "black";
+					OtherColor = "white";
+				}
+				UE_LOG(LogTemp, Warning, TEXT("AI_TestMove(MINIMAX(%i): %s %s on %s (Test tile: %s)"),
+					depth, *Color, *RootMoves[i]->ChessPiece->GetName(), *RootMoves[i]->ChessPiece->GetCurrentTile()->GetTileName().ToString(), *RootMoves[i]->PossibleTileToMove->GetTileName().ToString())
+				RootMoves[i]->ChessPiece->AI_TestMove(RootMoves[i]->PossibleTileToMove, Gameboard);
 
-		//		if (i < RootMoves.Num() - 1)
-		//		Undo(RootMoves[i], Gameboard);
+				BestMove = FMath::Min(BestMove, Minimax(Gameboard, depth - 1, Alpha, Beta, !IsMaximisingPlayer));
 
-		//		Beta = FMath::Min(Beta, BestMove);
-		//		if (Beta <= Alpha)
-		//		{
-		//			return BestMove;
-		//		}
+				if (i < RootMoves.Num() - 1)
+					Undo(RootMoves[i], Gameboard, false);
+				else if (i == RootMoves.Num() - 1)
+					Undo(RootMoves[i], Gameboard, true);
 
-		//	}
-		//	return BestMove;
-		//}
+				Beta = FMath::Min(Beta, BestMove);
+				if (Beta <= Alpha)
+				{
+					return BestMove;
+				}
+
+			}
+			return BestMove;
+		}*/
 	}
 	return 0;
 }

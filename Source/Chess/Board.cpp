@@ -680,6 +680,25 @@ void ABoard::RootUndo()
 			//???
 			//Tile->SetAllChessPiecePointersToNull();
 		}
+
+		
+		if (Tile->GetChessPiece())
+		{
+			if (Tile->GetChessPiece()->GetAllLastTiles().Num())
+			{
+				//ATile*& LastTile = Tile->GetChessPiece()->GetAllLastTiles()[0];
+
+				//Tile->GetChessPiece()->SetCurrentTile(LastTile);
+
+				//Tile->GetChessPiece()->GetCurrentTile()->SetChessPice(Tile->GetChessPiece());
+
+				//LastTile->SetChessPice(nullptr);
+
+				//LastTile = nullptr;
+
+				Tile->GetChessPiece()->EmptyAllLastTiles();
+			}
+		}
 	}
 }
 

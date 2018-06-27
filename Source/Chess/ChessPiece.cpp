@@ -73,7 +73,7 @@ void AChessPiece::MoveToNewTile(ATile*& NewTile, ABoard*& Gameboard)
 			// If the tile has a chesspiece, destroy it
 			if (NewTile->GetChessPiece())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("MoveToNewTile: Is capturing, %s(this = %s) is capturing %s!"), *CurrentTile->GetChessPiece()->GetName(), *GetName(), *NewTile->GetChessPiece()->GetName())
+				//UE_LOG(LogTemp, Warning, TEXT("MoveToNewTile: Is capturing, %s(this = %s) is capturing %s!"), *CurrentTile->GetChessPiece()->GetName(), *GetName(), *NewTile->GetChessPiece()->GetName())
 				NewTile->GetChessPiece()->Destroy();
 			}
 			// If not chesspiece ptr found, check the rootpiece
@@ -140,6 +140,9 @@ void AChessPiece::MoveToNewTile(ATile*& NewTile, ABoard*& Gameboard)
 		{
 			bIsFirstMove = false;
 		}
+
+		// Set current tile root piece / current piece if they are different 
+		FixTilesAtEndOfRound();
 	}
 	else
 	{
@@ -252,18 +255,18 @@ void AChessPiece::AI_UndoTestMove(FMove*& Move, ABoard *& GameBoard, bool IsLast
 
 			ATile*& LastTile = LastTiles[0];
 
-			CurrentTile = LastTiles.Last();
+			CurrentTile = LastTile;
 
 			UE_LOG(LogTemp, Warning, TEXT("AI_UndoTestMove: CurrentTile(%s) set chesspiece to %s (this)"), *this->CurrentTile->GetTileName().ToString(), *this->GetName())
 
-				CurrentTile->SetChessPice(this);
+			CurrentTile->SetChessPice(this);
 
 			UE_LOG(LogTemp, Warning, TEXT("AI_UndoTestMove: LastTile set chesspiece to null"), *Move->ChessPiece->GetLastTile()->GetTileName().ToString())
 
-				LastTile->SetChessPice(nullptr);
+			LastTile->SetChessPice(nullptr);
 
 			UE_LOG(LogTemp, Warning, TEXT("AI_UndoTestMove: LastTile set to null"), *Move->ChessPiece->GetLastTile()->GetTileName().ToString())
-				LastTile = nullptr;
+			LastTile = nullptr;
 
 			LastTiles.Empty();
 		}
@@ -290,8 +293,7 @@ void AChessPiece::AI_UndoTestMove(FMove*& Move, ABoard *& GameBoard, bool IsLast
 
 			LastTiles.Pop(true);
 		}
-		
-
+	
 		if (bHasTempFirstMoved)
 		{
 			bHasTempFirstMoved = false;
@@ -460,4 +462,13 @@ FName AChessPiece::GetCurrentTileName()
 	}
 
 	return NameToReturn;
+}
+
+void AChessPiece::FixTilesAtEndOfRound()
+{
+	if (CurrentTile->GetChessPiece() != this)
+	{
+		CurrentTile->SetChessPice(this);
+		CurrentTile->SetRootPieceFromCurrentChessPiece();
+	}
 }
