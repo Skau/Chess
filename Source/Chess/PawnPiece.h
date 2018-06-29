@@ -24,6 +24,6 @@ private:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& GameBoard) override;
+	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& GameBoard, bool IsAI) override;
 	
 };

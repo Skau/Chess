@@ -631,239 +631,251 @@ void ABoard::ResetAllChessPiecesToLastState()
 
 void ABoard::RootUndo()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Root undo"))
+	//UE_LOG(LogTemp, Warning, TEXT("Root undo"))
 
 	// For all tiles on the board
-	for (auto& Tile : Tiles)
-	{
-		//Tile->SetCurrentChessPieceToNull();
+	//for (auto& Tile : Tiles)
+	//{
 
 		// Reset Tile color and capture/move flags
-		Tile->SetDefaultMaterial();
+		//Tile->SetDefaultMaterial();
 
-		// Set the root piece to be the current one
-		Tile->ResetToRootChessPiece();
+		//// Set the root piece to be the current one
+		//Tile->ResetToRootChessPiece();
 
-		// If there is a piece on the tile
-		if (Tile->GetHasChessPiece())
-		{
-			// if the current root tile is not the current tile
-			if (Tile->GetChessPiece()->GetCurrentTile())
-			{
-				if (Tile->GetChessPiece()->GetCurrentRootTile())
-				{
-					if (Tile->GetChessPiece()->GetCurrentTile() != Tile->GetChessPiece()->GetCurrentRootTile())
-					{
-						Tile->GetChessPiece()->SetCurrentTile(Tile->GetChessPiece()->GetCurrentRootTile());
-					}
-				}
-			}
-			
-			// If AI Moved away from this tile, reset all pointers.
-			if (Tile->GetAIMovedFromThisTile())
-			{
-				Tile->SetAllChessPiecePointersToNull();
-				Tile->SetAIMovedFromThisTile(false);
-			}
+		//// If there is a piece on the tile
+		//if (Tile->GetHasChessPiece())
+		//{
+		//	// if the current root tile is not the current tile
+		//	if (Tile->GetChessPiece()->GetCurrentTile())
+		//	{
+		//		if (Tile->GetChessPiece()->GetCurrentRootTile())
+		//		{
+		//			if (Tile->GetChessPiece()->GetCurrentTile() != Tile->GetChessPiece()->GetCurrentRootTile())
+		//			{
+		//				Tile->GetChessPiece()->SetCurrentTile(Tile->GetChessPiece()->GetCurrentRootTile());
+		//			}
+		//		}
+		//	}
+		//	
+		//	// If AI Moved away from this tile, reset all pointers.
+		//	if (Tile->GetAIMovedFromThisTile())
+		//	{
+		//		Tile->SetAllChessPiecePointersToNull();
+		//		Tile->SetAIMovedFromThisTile(false);
+		//	}
 
-			// If AI Moved to this tile, root piece equals current piece
-			if (Tile->GetAIMovedToThisTile())
-			{
-				Tile->SetRootPieceFromCurrentChessPiece();
-				Tile->SetAIMovedToThisTile(false);
-			}
-			//Tile->GetChessPiece()->SetCurrentTileToRootTile();
-		}
-		// If no piece on tile, set all pointers to null
-		else
-		{
-			//???
-			//Tile->SetAllChessPiecePointersToNull();
-		}
+		//	// If AI Moved to this tile, root piece equals current piece
+		//	if (Tile->GetAIMovedToThisTile())
+		//	{
+		//		Tile->SetRootPieceFromCurrentChessPiece();
+		//		Tile->SetAIMovedToThisTile(false);
+		//	}
+		//}
+
 
 		
-		if (Tile->GetChessPiece())
-		{
-			if (Tile->GetChessPiece()->GetAllLastTiles().Num())
-			{
-				//ATile*& LastTile = Tile->GetChessPiece()->GetAllLastTiles()[0];
-
-				//Tile->GetChessPiece()->SetCurrentTile(LastTile);
-
-				//Tile->GetChessPiece()->GetCurrentTile()->SetChessPice(Tile->GetChessPiece());
-
-				//LastTile->SetChessPice(nullptr);
-
-				//LastTile = nullptr;
-
-				Tile->GetChessPiece()->EmptyAllLastTiles();
-			}
-		}
-	}
+	//	if (Tile->GetLastSavedInfo()->ChessPiece)
+	//	{
+	//		if (Tile->GetLastSavedInfo()->ChessPiece->GetAllLastTiles().Num())
+	//		{
+	//			Tile->GetLastSavedInfo()->ChessPiece->EmptyAllLastTiles();
+	//		}
+	//	}
+	//}
 }
 
-TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileUp())
 	{
-		if (!StartingTile->GetTileUp()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileUp());
-		} 
-		else
-		{
-			if (StartingTile->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPieceNULL ERROR"))return TilesToReturn; }
+			if (!StartingTile->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileUp()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileUp());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp());
-			}
-			else
-			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileUp());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
-		{
-			if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+			if (!StartingTile->GetTileUp()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileUp());
+			}
+			else
+			{
+				if (StartingTile->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileUp());
 					return TilesToReturn;
 				}
 				else
@@ -871,357 +883,712 @@ TArray<ATile*>& ABoard::GetAllTilesUp(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
+			if (StartingTile->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp())
+			{
+				if (!StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp()->GetTileUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
-		else
-		{
-			return TilesToReturn;
-		}
+		
 	}
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDown(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDown(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDown())
 	{
-		if (!StartingTile->GetTileDown()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileDown());
-		}
-		else
-		{
-			if (StartingTile->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPieceNULL ERROR"))return TilesToReturn; }
+		
+			if (!StartingTile->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileDown()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileDown());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown());
-			}
-			else
-			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDown());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
-		{
-			if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDown()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileDown());
+			}
+			else
+			{
+				if (StartingTile->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDown());
 					return TilesToReturn;
 				}
 				else
 				{
 					return TilesToReturn;
 				}
+				return TilesToReturn;
 			}
-		}
-		else
-		{
-			return TilesToReturn;
+
+			if (StartingTile->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown())
+			{
+				if (!StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown()->GetTileDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
 	}
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileLeft())
 	{
-		if (!StartingTile->GetTileLeft()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileLeft());
-		}
-		else
-		{
-			if (StartingTile->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece NULL ERROR"))return TilesToReturn; }
+		
+			if (!StartingTile->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileLeft());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft());
-			}
-			else
-			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileLeft());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft());
 			}
 			else
 			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
 			}
 			else
 			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
 			}
 			else
 			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
 			}
 			else
 			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
-		{
-			if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
 			}
 			else
 			{
-				if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileLeft()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileLeft());
+			}
+			else
+			{
+				if (StartingTile->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileLeft());
 					return TilesToReturn;
 				}
 				else
@@ -1229,178 +1596,353 @@ TArray<ATile*>& ABoard::GetAllTilesLeft(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
-		}
-		else
-		{
-			return TilesToReturn;
+			if (StartingTile->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft())
+			{
+				if (!StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+				}
+				else
+				{
+					if (StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft()->GetTileLeft());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
 	}
-
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesRight(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesRight(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileRight())
 	{
-		if (!StartingTile->GetTileRight()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileRight());
-		}
-		else
-		{
-			if (StartingTile->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece NULL ERROR"))return TilesToReturn; }
+		
+			if (!StartingTile->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileRight()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileRight());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight());
-			}
-			else
-			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileRight()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileRight());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight());
 			}
 			else
 			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
 			}
 			else
 			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
 			}
 			else
 			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
 			}
 			else
 			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
-		{
-			if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
 			}
 			else
 			{
-				if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileRight()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileRight());
+			}
+			else
+			{
+				if (StartingTile->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileRight()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileRight());
 					return TilesToReturn;
 				}
 				else
@@ -1408,178 +1950,354 @@ TArray<ATile*>& ABoard::GetAllTilesRight(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
-		}
-		else
-		{
-			return TilesToReturn;
+			if (StartingTile->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight())
+			{
+				if (!StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+				}
+				else
+				{
+					if (StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight()->GetTileRight());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
 	}
-
+	
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDiagonalRightUp())
 	{
-		if (!StartingTile->GetTileDiagonalRightUp()->GetHasChessPiece())
+		if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece NULL ERROR"))return TilesToReturn; }
+
+		// Ai
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp());
-		}
-		else
-		{
-			if (StartingTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (!StartingTile->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-			}
-			else
-			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
-		{
-			if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDiagonalRightUp()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp());
+			}
+			else
+			{
+				if (StartingTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp());
 					return TilesToReturn;
 				}
 				else
@@ -1587,178 +2305,353 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightUp(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
-		}
-		else
-		{
-			return TilesToReturn;
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp())
+			{
+				if (!StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp()->GetTileDiagonalRightUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
 	}
-
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
-
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
 
 	if (StartingTile->GetTileDiagonalRightDown())
 	{
-		if (!StartingTile->GetTileDiagonalRightDown()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown());
-		}
-		else
-		{
-			if (StartingTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece  NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-			}
-			else
-			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
-		{
-			if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDiagonalRightDown()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown());
+			}
+			else
+			{
+				if (StartingTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown());
 					return TilesToReturn;
 				}
 				else
@@ -1766,178 +2659,356 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalRightDown(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown())
+			{
+				if (!StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown()->GetTileDiagonalRightDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
-		else
-		{
-			return TilesToReturn;
-		}
+		
 	}
 
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
 
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
 
 	if (StartingTile->GetTileDiagonalLeftUp())
 	{
-		if (!StartingTile->GetTileDiagonalLeftUp()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp());
-		}
-		else
-		{
-			if (StartingTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece NULL ERROR"))return TilesToReturn; }
+			
+			if (!StartingTile->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-			}
-			else
-			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
-		{
-			if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+			if (!StartingTile->GetTileDiagonalLeftUp()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp());
+			}
+			else
+			{
+				if (StartingTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp());
 					return TilesToReturn;
 				}
 				else
@@ -1945,177 +3016,352 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftUp(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
-		}
-		else
-		{
-			return TilesToReturn;
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp())
+			{
+				if (!StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp()->GetTileDiagonalLeftUp());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
 	}
-
 	return TilesToReturn;
 }
 
-TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile*& StartingTile)
+TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile*& StartingTile, bool IsAi)
 {
 	TilesToReturn.Empty();
 
-	if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
-
 	if (StartingTile->GetTileDiagonalLeftDown())
 	{
-		if (!StartingTile->GetTileDiagonalLeftDown()->GetHasChessPiece())
+		// AI
+		if (IsAi)
 		{
-			TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown());
-		}
-		else
-		{
-			if (StartingTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+			if (StartingTile->GetLastSavedInfo()->ChessPiece == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetLastSavedInfo()->ChessPiece NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 			{
-				StartingTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown());
-				return TilesToReturn;
 			}
 			else
 			{
-				return TilesToReturn;
-			}
-		}
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-			}
-			else
-			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				if (StartingTile->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+					StartingTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown());
+					return TilesToReturn;
+				}
+				else
+				{
+					return TilesToReturn;
+				}
+			}
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
+				{
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
-					return TilesToReturn;
 				}
 				else
 				{
-					return TilesToReturn;
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
 				}
-			}
-		}
-		else
-		{
-			return TilesToReturn;
-		}
-
-		if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
-		{
-			if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
-			{
-				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
 			}
 			else
 			{
-				if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece)
 				{
-					StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
 					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetLastSavedInfo()->ChessPiece->GetIsWhite() != StartingTile->GetLastSavedInfo()->ChessPiece->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+		}
+		// Player
+		else
+		{
+			if (StartingTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("GetAllTiles%->GetChessPiece() NULL ERROR"))return TilesToReturn; }
+
+			if (!StartingTile->GetTileDiagonalLeftDown()->GetHasChessPiece())
+			{
+				TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown());
+			}
+			else
+			{
+				if (StartingTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+				{
+					StartingTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown());
 					return TilesToReturn;
 				}
 				else
@@ -2123,11 +3369,156 @@ TArray<ATile*>& ABoard::GetAllTilesDiagonalLeftDown(ATile*& StartingTile)
 					return TilesToReturn;
 				}
 			}
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
+
+			if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown())
+			{
+				if (!StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetHasChessPiece())
+				{
+					TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+				}
+				else
+				{
+					if (StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != StartingTile->GetChessPiece()->GetIsWhite())
+					{
+						StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
+						TilesToReturn.Add(StartingTile->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown()->GetTileDiagonalLeftDown());
+						return TilesToReturn;
+					}
+					else
+					{
+						return TilesToReturn;
+					}
+				}
+			}
+			else
+			{
+				return TilesToReturn;
+			}
 		}
-		else
-		{
-			return TilesToReturn;
-		}
+		
 	}
 
 	return TilesToReturn;

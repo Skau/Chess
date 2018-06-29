@@ -22,14 +22,14 @@ class CHESS_API ABoard : public AActor
 public:
 	TArray<ATile*>& GetAllTiles() { return Tiles; }
 
-	TArray<ATile*>& GetAllTilesUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDown(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesLeft(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesRight(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile*& StartingTile);
+	TArray<ATile*>& GetAllTilesUp(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesDown(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesLeft(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesRight(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile*& StartingTile, bool IsAi);
+	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile*& StartingTile, bool IsAi);
 
 	void SpawnChessPieces();
 

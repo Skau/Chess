@@ -6,6 +6,7 @@
 #include "ChessAI.h"
 #include "ChessPiece.h"
 #include "TimerManager.h"
+#include "Tile.h"
 
 
 AChessGameModeBase::AChessGameModeBase()
@@ -47,6 +48,11 @@ void AChessGameModeBase::StartGame(bool IsPlayingAgainstPlayer)
 	GameBoard->SpawnChessPieces();
 	bGameIsActive = true;
 	bAgainstPlayer = IsPlayingAgainstPlayer;
+
+	for (auto& Tile : GameBoard->GetAllTiles())
+	{
+		Tile->InitSavedInfo(GameBoard);
+	}
 
 	//if (!bAgainstPlayer)
 	//{

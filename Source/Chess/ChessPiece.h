@@ -45,7 +45,7 @@ public:
 
 	void SetCurrentTile(ATile* NewTile) { CurrentTile = NewTile; }
 
-	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& Gameboard);
+	virtual TArray<ATile*>& GetAllPossibleTiles(class ABoard*& Gameboard, bool IsAI);
 
 	void MoveToNewTile(ATile*& NewTile, class ABoard*& Gameboard);
 
@@ -130,7 +130,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	ATile* LastTile = nullptr;
-
+	
 	TArray<ATile*> AllPossibleTiles;
 
 	class AChessGameModeBase* GameMode = nullptr;

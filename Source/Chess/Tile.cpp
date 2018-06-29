@@ -124,7 +124,7 @@ void ATile::SetDarkMaterial()
 	}
 }
 
-TArray<ATilePtr>& ATile::GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, ABoard*& Gameboard)
+TArray<ATilePtr>& ATile::GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, ABoard*& Gameboard, bool IsAI)
 {
 	AllTilesInADirection.Empty();
 
@@ -133,56 +133,56 @@ TArray<ATilePtr>& ATile::GetAllTilesInADirection(ATilePtr& StartTile, EDirection
 		switch (Direction)
 		{
 		case EDirection::UP:
-			for (auto& TileToAdd : Gameboard->GetAllTilesUp(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesUp(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::DOWN:
-			for (auto& TileToAdd : Gameboard->GetAllTilesDown(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesDown(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::LEFT:
-			for (auto& TileToAdd : Gameboard->GetAllTilesLeft(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesLeft(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::RIGHT:
-			for (auto& TileToAdd : Gameboard->GetAllTilesRight(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesRight(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::DIARIGHTUP:
-			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightUp(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightUp(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::DIARIGHTDOWN:
-			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightDown(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalRightDown(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::DIALEFTUP:
-			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftUp(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftUp(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
 			}
 			break;
 		case EDirection::DIALEFTDOWN:
-			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftDown(StartTile))
+			for (auto& TileToAdd : Gameboard->GetAllTilesDiagonalLeftDown(StartTile, IsAI))
 			{
 				TileToAdd->SetIsPossibleMoveLocation(true);
 				AllTilesInADirection.Add(TileToAdd);
@@ -266,4 +266,54 @@ void ATile::SetAllChessPiecePointersToNull()
 	TempAddedChessPiece = nullptr;
 	TempRemovedChessPiece = nullptr;
 	TempCapturedChessPiece = nullptr;
+}
+
+void ATile::InitSavedInfo(ABoard*& Gameboard)
+{
+	SavedInfoArr.Empty();
+
+	for (auto& Tile : Gameboard->GetAllTiles())
+	{
+		if (Tile->GetHasChessPiece())
+		{
+			Tile->AddNewSavedInfo(Tile->GetChessPiece(), false);
+		}
+	}
+}
+
+void ATile::RemoveLastSavedInfo()
+{
+	if (SavedInfoArr.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemoveLastSavedInfo: Removing LastSavedInfo"))
+		if (SavedInfoArr.Num() > 1)
+		{
+			//auto s = SavedInfoArr[SavedInfoArr.Num() - 1];
+
+			//if (s->PieceHasBeenCaptured)
+			//{
+			//	SavedInfoArr.RemoveAt(SavedInfoArr.Num() - 1);
+			//}
+
+			UE_LOG(LogTemp, Warning, TEXT("RemoveLastSavedInfo: Removed SavedInfo at index %i"), SavedInfoArr.Num()-1)
+			SavedInfoArr.RemoveAt(SavedInfoArr.Num() - 1);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("RemoveLastSavedInfo: Only one index in SavedInfo, so emptying array"))
+			SavedInfoArr.Empty();
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemoveLastSavedInfo: Array is empty!"))
+	}
+}
+
+FSavedInfo*& ATile::GetLastSavedInfo()
+{
+	if (SavedInfoArr.Num())
+		return SavedInfoArr[SavedInfoArr.Num() - 1]; 
+	else
+		return SavedInfoArr.Last();
 }

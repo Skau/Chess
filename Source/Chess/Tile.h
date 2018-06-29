@@ -12,6 +12,36 @@ class ATile;
 typedef AChessPiece* AChessPiecePtr;
 typedef ATile* ATilePtr;
 
+USTRUCT(immutable, noexport, BlueprintType)
+struct FSavedInfo
+{
+	UPROPERTY()
+	AChessPiece* ChessPiece = nullptr;
+
+	FSavedInfo()
+	{
+		ChessPiece = nullptr;
+	}
+
+	// Will copy(?)
+	FSavedInfo(FSavedInfo& SavedInfo)
+	{
+		SavedInfo.ChessPiece = ChessPiece;
+	}
+
+	FSavedInfo(AChessPiece*& ChessPieceIn, bool DidCapturePiece)
+	{
+		ChessPiece = ChessPieceIn;
+		if (DidCapturePiece)
+		{
+			PieceHasBeenCaptured = true;
+		}
+	}
+
+	bool PieceHasBeenCaptured;
+
+};
+
 enum class EDirection 
 {
 	UP,
@@ -30,6 +60,9 @@ class CHESS_API ATile : public AActor
 	GENERATED_BODY()
 	
 public:
+	// Sets default values for this actor's properties
+	ATile();
+
 	void SetDarkMaterial();
 
 	void SetLightMaterial();
@@ -68,7 +101,7 @@ public:
 	
 	bool GetIsPossibleCaptureLocation() { return bIsPossibleCaptureLocation; }
 
-	TArray<ATilePtr>& GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, class ABoard*& Gameboard);
+	TArray<ATilePtr>& GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, class ABoard*& Gameboard, bool IsAI);
 
 	void SetTileUp(ATilePtr TileIn) { TileUp = TileIn; }
 	void SetTileDown(ATilePtr TileIn) { TileDown = TileIn; }
@@ -126,10 +159,27 @@ public:
 	void SetAIMovedToThisTile(bool Value) { bAIMovedToThisTile = Value; }
 	bool GetAIMovedToThisTile() { return bAIMovedToThisTile; }
 
-private:
-	// Sets default values for this actor's properties
-	ATile();
+	void InitSavedInfo(class ABoard*& Gameboard);
 
+	void AddNewSavedInfo(FSavedInfo*& SavedInfo)
+	{
+		SavedInfoArr.Add(SavedInfo);
+	}
+
+	void AddNewSavedInfo(AChessPiece*& ChessPiece, bool DidCapture)
+	{
+		SavedInfoArr.Push(new FSavedInfo(ChessPiece, DidCapture));
+	}
+
+	TArray<FSavedInfo*>& GetAllSavedInfo() { return SavedInfoArr; }
+
+	FSavedInfo*& GetLastSavedInfo();
+
+	void RemoveLastSavedInfo();
+
+	int GetSavedInfoNum() { UE_LOG(LogTemp, Warning, TEXT("SavedInfoArr.Num() = %i"), SavedInfoArr.Num()) return SavedInfoArr.Num(); }
+
+private:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -202,4 +252,7 @@ private:
 	ATile* TileDiagonalLeftDown = nullptr;
 
 	TArray<ATilePtr> AllTilesInADirection;
+
+	//UPROPERTY(VisibleAnywhere)
+	TArray<FSavedInfo*> SavedInfoArr;
 };

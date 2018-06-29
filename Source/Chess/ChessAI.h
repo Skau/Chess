@@ -70,7 +70,7 @@ private:
 
 	int Minimax(ABoard*& Gameboard, int depth, int Alpha, int Beta, bool IsMaximisingPlayer);
 
-	TArray<FMove*>& FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer);
+	TArray<FMove*>& FindAllPossibleMoves(ABoard*& GameBoard, bool IsMaximisingPlayer, bool IsRootMoves);
 
 	int EvaluateBoard(ABoard*& GameBoard);
 
