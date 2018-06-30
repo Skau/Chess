@@ -2,6 +2,7 @@
 
 #include "QueenPiece.h"
 #include "Tile.h"
+#include "Board.h"
 
 void AQueenPiece::BeginPlay()
 {
@@ -19,42 +20,21 @@ void AQueenPiece::BeginPlay()
 
 TArray<ATile*>& AQueenPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
-	PossibleTilesToMove.Empty();
+	if (PossibleTilesToMove.Num())
+	{
+		PossibleTilesToMove.Empty();
+	}
 
 	if (CurrentTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("Piece: GetAllPossibleTiles: CurrentTile->GetHasChessPiece() NULL ERROR")) return PossibleTilesToMove; }
-
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTUP, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTUP, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
+	
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::UP));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DOWN));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTUP));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTUP));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN));
 
 	return PossibleTilesToMove;
 }

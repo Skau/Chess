@@ -14,22 +14,29 @@ typedef ATile* ATilePtr;
 typedef ABoard* ABoardPtr;
 typedef AChessPiece* AChessPiecePtr;
 
+enum class EDirection
+{
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	DIARIGHTUP,
+	DIARIGHTDOWN,
+	DIALEFTUP,
+	DIALEFTDOWN
+};
+
 UCLASS()
 class CHESS_API ABoard : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-	TArray<ATile*>& GetAllTiles() { return Tiles; }
+	TArray<ATilePtr>& GetAllTiles() { return Tiles; }
 
-	TArray<ATile*>& GetAllTilesUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDown(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesLeft(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesRight(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalRightDown(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftUp(ATile*& StartingTile);
-	TArray<ATile*>& GetAllTilesDiagonalLeftDown(ATile*& StartingTile);
+	TArray<ATilePtr>& GetTilesInADirection(ATilePtr& StartTile, EDirection Direction, bool CanCapture = true, int NumberOfTiles = 7);
+
+	//ATilePtr& GetSingleTileInADirection(ATilePtr& StartTile, EDirection Direction, bool CanCapture = true, int NumberOfTilesAway);
 
 	void SpawnChessPieces();
 
@@ -106,7 +113,10 @@ private:
 
 	TArray<ATile*> Tiles;
 
+	UPROPERTY(VisibleAnywhere)
 	TArray<ATile*> TilesToReturn;
+
+	TArray<ATile*> AllTilesInADirection;
 
 	TArray<AChessPiece*> ChessPieces;
 

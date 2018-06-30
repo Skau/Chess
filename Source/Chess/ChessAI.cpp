@@ -33,7 +33,7 @@ void AChessAI::Tick(float DeltaTime)
 
 void AChessAI::StartRound(ABoard*& GameBoard)
 {
-	auto Move = MiniMaxRoot(GameBoard, 4, 1);
+	auto Move = MiniMaxRoot(GameBoard, 2, 1);
 
 	MovePiece(Move, GameBoard);
 }

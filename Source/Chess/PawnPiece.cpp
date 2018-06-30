@@ -31,7 +31,7 @@ void APawnPiece::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& GameBoard)
+TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
 	AllPossibleTiles.Empty();
 
@@ -39,42 +39,31 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 
 	if (bIsWhite)
 	{
-		if (CurrentTile->GetTileLeft())
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT, false, 1).IsValidIndex(1))
 		{
-			if (!CurrentTile->GetTileLeft()->GetHasChessPiece())
-			{
-				AllPossibleTiles.Add(CurrentTile->GetTileLeft());
+			AllPossibleTiles.Add(Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT, false, 1)[1]);
 
-				if (bIsFirstMove)
+			if (bIsFirstMove)
+			{
+				if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT, false, 2).IsValidIndex(2))
 				{
-					if (CurrentTile->GetTileLeft()->GetTileLeft())
-					{
-						if (!CurrentTile->GetTileLeft()->GetTileLeft()->GetHasChessPiece())
-						{
-							AllPossibleTiles.Add(CurrentTile->GetTileLeft()->GetTileLeft());
-						}
-					}
+					AllPossibleTiles.Add(Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT, false, 2)[2]);
 				}
 			}
+		
 		}
 	}
 	else
 	{
-		if (CurrentTile->GetTileRight())
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT, false, 1).IsValidIndex(1))
 		{
-			if (!CurrentTile->GetTileRight()->GetHasChessPiece())
+			AllPossibleTiles.Add(Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT, false, 1)[1]);
+			
+			if (bIsFirstMove)
 			{
-				AllPossibleTiles.Add(CurrentTile->GetTileRight());
-
-				if (bIsFirstMove)
+				if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT, false, 2).IsValidIndex(2))
 				{
-					if (CurrentTile->GetTileRight()->GetTileRight())
-					{
-						if (!CurrentTile->GetTileRight()->GetTileRight()->GetHasChessPiece())
-						{
-							AllPossibleTiles.Add(CurrentTile->GetTileRight()->GetTileRight());
-						}
-					}
+					AllPossibleTiles.Add(Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT, false, 2)[2]);
 				}
 			}
 		}
@@ -83,57 +72,63 @@ TArray<ATile*>& APawnPiece::GetAllPossibleTiles(ABoard*& GameBoard)
 	if (bIsWhite)
 	{
 		// Diagonal Left
-		if (CurrentTile->GetTileDiagonalLeftDown())
+
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN, true, 1).IsValidIndex(1))
 		{
-			if (CurrentTile->GetTileDiagonalLeftDown()->GetHasChessPiece())
+			ATile*& Tile = Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTDOWN, true, 1)[1];
+
+			if (Tile->GetHasChessPiece())
 			{
-				if (CurrentTile->GetTileDiagonalLeftDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (!Tile->GetChessPiece()->GetIsWhite())
 				{
-					CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleMoveLocation(true);
-					CurrentTile->GetTileDiagonalLeftDown()->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftDown());
+					AllPossibleTiles.Add(Gameboard->GetTilesInADirection(Tile, EDirection::DIALEFTDOWN, true, 1)[1]);
 				}
 			}
 		}
-		// Diagonal Right
-		if (CurrentTile->GetTileDiagonalLeftUp())
+
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTUP, true, 1).IsValidIndex(1))
 		{
-			if (CurrentTile->GetTileDiagonalLeftUp()->GetHasChessPiece())
+			ATile*& Tile = Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIALEFTUP, true, 1)[1];
+			if (Tile)
 			{
-				if (CurrentTile->GetTileDiagonalLeftUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (Tile->GetHasChessPiece())
 				{
-					CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleMoveLocation(true);
-					CurrentTile->GetTileDiagonalLeftUp()->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalLeftUp());
+					if (!Tile->GetChessPiece()->GetIsWhite())
+					{
+						AllPossibleTiles.Add(Gameboard->GetTilesInADirection(Tile, EDirection::DIALEFTUP, true, 1)[1]);
+					}
 				}
 			}
 		}
 	}
 	else
 	{
-		// Diagonal Left
-		if (CurrentTile->GetTileDiagonalRightUp())
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTUP, true, 1).IsValidIndex(1))
 		{
-			if (CurrentTile->GetTileDiagonalRightUp()->GetHasChessPiece())
+			ATile*& Tile = Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTUP, true, 1)[1];
+			if (Tile)
 			{
-				if (CurrentTile->GetTileDiagonalRightUp()->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (Tile->GetHasChessPiece())
 				{
-					CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleMoveLocation(true);
-					CurrentTile->GetTileDiagonalRightUp()->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightUp());
+					if (Tile->GetChessPiece()->GetIsWhite())
+					{
+						AllPossibleTiles.Add(Gameboard->GetTilesInADirection(Tile, EDirection::DIARIGHTUP, true, 1)[1]);
+					}
 				}
 			}
 		}
-		// Diagonal Right
-		if (CurrentTile->GetTileDiagonalRightDown())
+		
+		if (Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN, true, 1).IsValidIndex(1))
 		{
-			if (CurrentTile->GetTileDiagonalRightDown()->GetHasChessPiece())
+			ATile*& Tile = Gameboard->GetTilesInADirection(CurrentTile, EDirection::DIARIGHTDOWN, true, 1)[1];
+			if (Tile)
 			{
-				if (CurrentTile->GetTileDiagonalRightDown()->GetChessPiece()->GetIsWhite() != bIsWhite)
+				if (Tile->GetHasChessPiece())
 				{
-					CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleMoveLocation(true);
-					CurrentTile->GetTileDiagonalRightDown()->SetIsPossibleCaptureLocation(true);
-					AllPossibleTiles.Add(CurrentTile->GetTileDiagonalRightDown());
+					if (Tile->GetChessPiece()->GetIsWhite())
+					{
+						AllPossibleTiles.Add(Gameboard->GetTilesInADirection(Tile, EDirection::DIARIGHTDOWN, true, 1)[1]);
+					}
 				}
 			}
 		}

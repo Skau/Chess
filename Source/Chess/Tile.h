@@ -12,18 +12,6 @@ class ATile;
 typedef AChessPiece* AChessPiecePtr;
 typedef ATile* ATilePtr;
 
-enum class EDirection 
-{
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	DIARIGHTUP,
-	DIARIGHTDOWN,
-	DIALEFTUP,
-	DIALEFTDOWN
-};
-
 UCLASS()
 class CHESS_API ATile : public AActor
 {
@@ -67,8 +55,6 @@ public:
 	void SetIsPossibleCaptureLocation(bool Value) { bIsPossibleCaptureLocation = Value; }
 	
 	bool GetIsPossibleCaptureLocation() { return bIsPossibleCaptureLocation; }
-
-	TArray<ATilePtr>& GetAllTilesInADirection(ATilePtr& StartTile, EDirection Direction, class ABoard*& Gameboard);
 
 	void SetTileUp(ATilePtr TileIn) { TileUp = TileIn; }
 	void SetTileDown(ATilePtr TileIn) { TileDown = TileIn; }

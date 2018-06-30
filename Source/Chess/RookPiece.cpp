@@ -2,6 +2,7 @@
 
 #include "RookPiece.h"
 #include "Tile.h"
+#include "Board.h"
 
 void ARookPiece::BeginPlay()
 {
@@ -19,25 +20,17 @@ void ARookPiece::BeginPlay()
 
 TArray<ATile*>& ARookPiece::GetAllPossibleTiles(ABoard*& Gameboard)
 {
-	PossibleTilesToMove.Empty();
+	if (PossibleTilesToMove.Num())
+	{
+		PossibleTilesToMove.Empty();
+	}
 
 	if (CurrentTile->GetChessPiece() == nullptr) { UE_LOG(LogTemp, Error, TEXT("Piece: GetAllPossibleTiles: CurrentTile->GetHasChessPiece() NULL ERROR")) return PossibleTilesToMove; }
 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::UP, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	} 
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::DOWN, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::LEFT, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
-	for (auto& Tile : CurrentTile->GetAllTilesInADirection(CurrentTile, EDirection::RIGHT, Gameboard))
-	{
-		PossibleTilesToMove.Add(Tile);
-	}
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::UP));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::DOWN));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::LEFT));
+	PossibleTilesToMove.Append(Gameboard->GetTilesInADirection(CurrentTile, EDirection::RIGHT));
+
 	return PossibleTilesToMove;
 }
